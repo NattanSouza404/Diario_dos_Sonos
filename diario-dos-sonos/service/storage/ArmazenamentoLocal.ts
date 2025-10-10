@@ -1,11 +1,14 @@
 import IntervaloSono from "@/models/IntervaloSono";
+import { MediaMesSono } from "@/models/MediaMesSono";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DeviceEventEmitter } from "react-native";
+import { calcularMediaMesAtual } from "../SonoService";
 
 const Chaves = {
     INTERVALOS_SONO: "intervalosSono",
     SONO_IS_ATIVO: "sonoIsAtivo",
-    ULTIMA_MARCACAO: "ultimaMarcacao"
+    ULTIMA_MARCACAO: "ultimaMarcacao",
+    MEDIA_MES: "mediaMes"
 }
 
 export default class ArmazenamentoLocal {
@@ -86,7 +89,32 @@ export default class ArmazenamentoLocal {
         ));
 
         AsyncStorage.setItem(Chaves.INTERVALOS_SONO, JSON.stringify(intervalos));
+        
+        this.setMediasMes(
+            await calcularMediaMesAtual(intervalos)
+        );
+        
         this.emitirMudou();
+    }
+
+    async getMediaMes(): Promise<MediaMesSono> {
+        let media = await AsyncStorage.getItem(Chaves.MEDIA_MES);
+
+        if (!media){
+            const mediaPadrao:MediaMesSono = {
+                horas: 0, minutos: 0
+            }
+
+            AsyncStorage.setItem(Chaves.MEDIA_MES, JSON.stringify(mediaPadrao));
+
+            media = JSON.stringify(mediaPadrao);
+        }
+
+        return JSON.parse(media) as MediaMesSono;
+    }
+
+    async setMediasMes(media:MediaMesSono){
+        AsyncStorage.setItem(Chaves.MEDIA_MES, JSON.stringify(media));
     }
 
     private async inicializarIntervalosSono(): Promise<string> {
