@@ -6,6 +6,14 @@ O Diário dos Sonos é um Aplicativo Mobile que permite você registrar e contro
 - React Native
 - Expo
 
+## Iniciando o projeto
+
+   ```
+   cd diario-dos-sonos/
+   npm install
+   npx expo start
+   ```
+
 ### Criação inicial do projeto
 
 Os comandos usados para criar o projeto:
