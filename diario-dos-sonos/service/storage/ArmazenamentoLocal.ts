@@ -1,8 +1,6 @@
 import IntervaloSono from "@/models/IntervaloSono";
 import { MediaMesSono } from "@/models/MediaMesSono";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { DeviceEventEmitter } from "react-native";
-import { calcularMediaMesAtual } from "../SonoService";
 
 const Chaves = {
     INTERVALOS_SONO: "intervalosSono",
@@ -12,32 +10,14 @@ const Chaves = {
 }
 
 export default class ArmazenamentoLocal {
-    
-    private constructor(){}
-    
-    private static instance : ArmazenamentoLocal;
 
-    static getInstance() : ArmazenamentoLocal{
-        if (!this.instance){
-            this.instance = new ArmazenamentoLocal();
-        }
-
-        return this.instance;
-    }
-
-    emitirMudou(){
-        DeviceEventEmitter.emit('mudou');
-    }
-
-    onMudou(callback: () => void) {
-        return DeviceEventEmitter.addListener('mudou', callback);
-    }
+    // TODO: refatorar inicialização do armazenamento
 
     async getIntervalos(): Promise<IntervaloSono[]> {
         let intervalos = await AsyncStorage.getItem(Chaves.INTERVALOS_SONO);
     
-        if (!intervalos){
-            intervalos = await this.inicializarIntervalosSono();
+        if (!intervalos || intervalos === 'undefined'){
+            intervalos = await this.inicializar(Chaves.INTERVALOS_SONO);
         }
 
         const parsed = JSON.parse(intervalos) as {
@@ -53,8 +33,8 @@ export default class ArmazenamentoLocal {
     async getSonoIsAtivo(): Promise<boolean> {
         let ativado = await AsyncStorage.getItem(Chaves.SONO_IS_ATIVO);
 
-        if (!ativado){
-            ativado = await this.inicializarAtivado();
+        if (!ativado || ativado === 'undefined'){
+            ativado = await this.inicializar(Chaves.SONO_IS_ATIVO);
         }
 
         return ativado === 'true' ? true : false;
@@ -62,52 +42,31 @@ export default class ArmazenamentoLocal {
 
     async setSonoIsAtivo(ativado: boolean): Promise<void> {
         AsyncStorage.setItem(Chaves.SONO_IS_ATIVO, JSON.stringify(ativado));
-        this.emitirMudou();
     }
 
     async getUltimaMarcacao(): Promise<Date> {
         let ultimaMarcacao = await AsyncStorage.getItem(Chaves.ULTIMA_MARCACAO);
 
-        if (!ultimaMarcacao){
-            ultimaMarcacao = JSON.stringify(new Date(Date.now()).toISOString());
+        if (!ultimaMarcacao || ultimaMarcacao === 'undefined'){
+            ultimaMarcacao = await this.inicializar(Chaves.ULTIMA_MARCACAO);
         }
 
         return new Date(ultimaMarcacao);
     }
 
-    async iniciarIntervaloSono(): Promise<void> {
-        const date = new Date(Date.now());
+    async setUltimaMarcacao(date: Date): Promise<void> {
         AsyncStorage.setItem(Chaves.ULTIMA_MARCACAO, date.toISOString());
     }
 
-    async pararIntervaloSono(): Promise<void> {
-        const date = new Date(Date.now()).toISOString();
-
-        const intervalos = await this.getIntervalos();
-        intervalos.push
-            (new IntervaloSono(await this.getUltimaMarcacao(), new Date(date)
-        ));
-
+    async setIntervalosSono(intervalos: IntervaloSono[]): Promise<void> {
         AsyncStorage.setItem(Chaves.INTERVALOS_SONO, JSON.stringify(intervalos));
-        
-        this.setMediasMes(
-            await calcularMediaMesAtual(intervalos)
-        );
-        
-        this.emitirMudou();
     }
 
     async getMediaMes(): Promise<MediaMesSono> {
         let media = await AsyncStorage.getItem(Chaves.MEDIA_MES);
 
-        if (!media){
-            const mediaPadrao:MediaMesSono = {
-                horas: 0, minutos: 0
-            }
-
-            AsyncStorage.setItem(Chaves.MEDIA_MES, JSON.stringify(mediaPadrao));
-
-            media = JSON.stringify(mediaPadrao);
+        if (!media || media === 'undefined'){
+            media = await this.inicializar(Chaves.MEDIA_MES);
         }
 
         return JSON.parse(media) as MediaMesSono;
@@ -117,28 +76,48 @@ export default class ArmazenamentoLocal {
         AsyncStorage.setItem(Chaves.MEDIA_MES, JSON.stringify(media));
     }
 
-    private async inicializarIntervalosSono(): Promise<string> {
-        const intervalosPadrao = [
-            new IntervaloSono(new Date('2025-10-10'), new Date('2025-10-10')),
-        ];
+    private async inicializar(chave:string): Promise<string> {
 
-        await AsyncStorage.setItem(
-            Chaves.INTERVALOS_SONO, 
-            JSON.stringify(intervalosPadrao)  
-        );
+        switch (chave){
+            case Chaves.INTERVALOS_SONO:
+                const intervalosPadrao = [
+                    new IntervaloSono(new Date('2025-10-10'), new Date('2025-10-10')),
+                ];
 
-        return JSON.stringify(intervalosPadrao);
-    }
+                await AsyncStorage.setItem(
+                    Chaves.INTERVALOS_SONO, 
+                    JSON.stringify(intervalosPadrao)  
+                );
 
-    private async inicializarAtivado(): Promise<string> {
-        const ativadoPadrao = false;
+                return JSON.stringify(intervalosPadrao);
 
-        await AsyncStorage.setItem(
-            Chaves.SONO_IS_ATIVO,
-            JSON.stringify(ativadoPadrao)
-        );
+            case Chaves.MEDIA_MES:
+                const mediaPadrao:MediaMesSono = {
+                    horas: 0, minutos: 0
+                }
 
-        return JSON.stringify(ativadoPadrao);
+                AsyncStorage.setItem(Chaves.MEDIA_MES, JSON.stringify(mediaPadrao));
+
+                return JSON.stringify(mediaPadrao);
+
+            case Chaves.SONO_IS_ATIVO:
+                const ativadoPadrao = false;
+
+                await AsyncStorage.setItem(
+                    Chaves.SONO_IS_ATIVO,
+                    JSON.stringify(ativadoPadrao)
+                );
+
+                return JSON.stringify(ativadoPadrao);
+
+            case Chaves.ULTIMA_MARCACAO:
+                const ultimaMarcacaoPadrao = new Date().toISOString();  
+                AsyncStorage.setItem(Chaves.ULTIMA_MARCACAO, ultimaMarcacaoPadrao);
+                
+                return JSON.stringify(ultimaMarcacaoPadrao);
+        }
+
+        throw new Error(`Chave não encontrada: ${chave}`);
     }
         
 }
