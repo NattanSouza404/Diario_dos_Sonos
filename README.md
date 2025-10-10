@@ -23,3 +23,6 @@ Os comandos usados para criar o projeto:
 
 npx create-expo-app@latest
 ```
+
+### Créditos
+Ícone de travesseiro: <a href="https://www.flaticon.com/free-icons/pillow" title="pillow icons">Pillow icons created by Freepik - Flaticon</a>
