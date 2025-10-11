@@ -2,6 +2,7 @@ import IntervaloSono from "@/models/IntervaloSono";
 import { MediaMesSono } from "@/models/MediaMesSono";
 import ArmazenamentoLocal from "./storage/ArmazenamentoLocal";
 import { DeviceEventEmitter, EmitterSubscription } from "react-native";
+import { Formatador } from "./Formatador";
 
 export interface ISonoService {
     getSonoIsAtivo(): Promise<boolean>;
@@ -59,6 +60,13 @@ export class SonoService implements ISonoService {
         );
 
         const intervalos = await this.getIntervalos();
+
+        intervalos.forEach(i => {
+            if (Formatador(i.horaInicio).data === Formatador(novoIntervalo.horaInicio).data){
+                throw new Error("Já existe um intervalo de sono para o dia de hoje.");
+            }
+        });
+
         intervalos.push(novoIntervalo);
 
         this._armazenamento.setIntervalosSono(intervalos);
@@ -67,6 +75,18 @@ export class SonoService implements ISonoService {
             await this.calcularMediaMesAtual(intervalos)
         );
         
+        this.emitirMudou();
+    }
+
+    async deletarIntervaloSono(intervalo: IntervaloSono): Promise<void> {
+        const intervalos = await this.getIntervalos();
+
+        const novosIntervalos = intervalos.filter(i => 
+            !(i.horaInicio.getTime() === intervalo.horaInicio.getTime() &&
+            i.horaFim.getTime() === intervalo.horaFim.getTime())
+        );
+
+        this._armazenamento.setIntervalosSono(novosIntervalos);
         this.emitirMudou();
     }
 

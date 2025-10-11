@@ -2,12 +2,15 @@ import { diferencaEntreDatas, Formatador } from "@/service/Formatador";
 import { ThemedText } from "./themed-text"
 import { ThemedView } from "./themed-view"
 import IntervaloSono from "@/models/IntervaloSono";
+import { Pressable } from "react-native";
+import { AlertUtils } from "@/utils/AlertUtils";
+import { SonoService } from "@/service/SonoService";
 
 type Props = {
     intervaloSono: IntervaloSono,
 }
 
-export const MarcacaoSono = ({intervaloSono}:Props) => {
+export const MarcacaoSono = ({intervaloSono }:Props) => {
 
     const horaInicio = intervaloSono.horaInicio;
     const horaFim = intervaloSono.horaFim;
@@ -17,6 +20,16 @@ export const MarcacaoSono = ({intervaloSono}:Props) => {
 
     const diffInicioEFim = diferencaEntreDatas(horaInicio, horaFim);
 
+    const deletarIntervalo = async (intervalo:IntervaloSono) => {
+        AlertUtils.confirm(
+            "Deseja realmente apagar esse intervalo de sono?",
+
+            async () => {
+                await SonoService.getInstance().deletarIntervaloSono(intervalo);
+            }
+        );
+    }
+
     return (
         <ThemedView style={{ backgroundColor: 'white'}}>
             <ThemedText type='title'>{fmtInicio.mes} {fmtInicio.ano}</ThemedText>
@@ -25,6 +38,9 @@ export const MarcacaoSono = ({intervaloSono}:Props) => {
             <ThemedText>{fmtInicio.horario} - {fmtFim.horario}</ThemedText>
             <ThemedText>Média Semanal</ThemedText>
             <ThemedText>Qualidade de sono: Boa</ThemedText>
+            <Pressable onPress={() => deletarIntervalo(intervaloSono)}>
+                X
+            </Pressable>
         </ThemedView>
     );
 }
