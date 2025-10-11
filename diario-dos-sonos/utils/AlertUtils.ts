@@ -1,6 +1,10 @@
 import { Alert, Platform } from "react-native";
 
 class AlertWeb {
+    alert(msg:string){
+        alert(msg);
+    }
+
     confirm(msg:string, handleConfirmacao:Function){
         if (confirm(msg)){
             handleConfirmacao();
@@ -9,6 +13,10 @@ class AlertWeb {
 }
 
 class AlertAndroid {
+    alert(msg:string){
+        Alert.alert("Atenção", msg);
+    }
+
     confirm(msg:string, handleConfirmacao:Function){
         Alert.alert("Atenção", msg, [
         {
@@ -24,7 +32,7 @@ class AlertAndroid {
 }
 
 export class AlertUtils {
-    static implAlert: AlertWeb | AlertAndroid; 
+    private static implAlert: AlertWeb | AlertAndroid; 
 
     static {
         if (Platform.OS === 'web'){
@@ -38,6 +46,10 @@ export class AlertUtils {
 
     static confirm(msg:string, handleConfirmacao:Function){
         this.implAlert.confirm(msg, handleConfirmacao);
+    }
+
+    static alert(msg:string){
+        this.implAlert.alert(msg);
     }
 
 }
