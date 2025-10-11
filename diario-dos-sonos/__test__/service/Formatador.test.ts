@@ -1,4 +1,4 @@
-import { Formatador } from "@/service/Formatador";
+import { diferencaEntreDatas, Formatador } from "@/service/Formatador";
 
 describe('Formatador', () => {
   test('formata corretamente a data', () => {
@@ -20,5 +20,18 @@ describe('Formatador', () => {
 
         horario: "14:30:45"
     });
+  });
+
+  test('formata corretamente a diferença entre datas', () => {
+    const dataInicio = new Date('2024-06-15T14:30:45');
+    const dataFim = new Date('2024-06-15T16:45:50');
+    const diff = diferencaEntreDatas(dataInicio, dataFim); 
+
+    expect(diff).toEqual(
+      {
+        horas: 2,
+        minutos: 15,
+        segundos: 5
+      });
   });
 });
