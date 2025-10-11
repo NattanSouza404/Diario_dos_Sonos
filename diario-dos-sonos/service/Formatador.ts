@@ -3,10 +3,12 @@ const OPCOES = { timeZone: 'America/Sao_Paulo', hour12: false };
 
 export const Formatador = (data: Date) => {
     return {
-        dia:        data.toLocaleString(LOCAL, { ...OPCOES, weekday: 'short' }),
+        dia:        data.toLocaleString(LOCAL, { ...OPCOES, day: '2-digit' }),
         mes:        data.toLocaleString(LOCAL, { ...OPCOES, month: 'long' }),
         ano:        data.toLocaleString(LOCAL, { ...OPCOES, year: 'numeric' }),
         diaSemana:  data.toLocaleString(LOCAL, { ...OPCOES, weekday: 'long' }),
+
+        data:       data.toLocaleString(LOCAL).slice(0, 10),
 
         hora:       data.toLocaleString(LOCAL, { ...OPCOES, hour: '2-digit' }),
         minuto:     data.toLocaleString(LOCAL, { ...OPCOES, minute: '2-digit' }),
