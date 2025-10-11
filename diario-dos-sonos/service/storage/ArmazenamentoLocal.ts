@@ -80,13 +80,11 @@ export default class ArmazenamentoLocal {
 
         switch (chave){
             case Chaves.INTERVALOS_SONO:
-                const intervalosPadrao = [
-                    new IntervaloSono(new Date('2025-10-10'), new Date('2025-10-10')),
-                ];
+                const intervalosPadrao: IntervaloSono[] = [];
 
                 await AsyncStorage.setItem(
                     Chaves.INTERVALOS_SONO, 
-                    JSON.stringify(intervalosPadrao)  
+                    JSON.stringify(intervalosPadrao as IntervaloSono[])  
                 );
 
                 return JSON.stringify(intervalosPadrao);
