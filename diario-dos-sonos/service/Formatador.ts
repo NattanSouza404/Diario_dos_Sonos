@@ -24,5 +24,13 @@ export const diferencaEntreDatas = (inicio: Date, fim: Date) => {
   const minutos = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
   const segundos = Math.floor((diffMs % (1000 * 60)) / 1000);
 
-  return { horas, minutos, segundos };
+  const duracaoEmExtenso = `${horas}h, ${minutos}m e ${segundos}s`;
+
+  return { horas, minutos, segundos, duracaoEmExtenso };
+}
+
+export const avancarUmDia = (data: Date) : Date => {
+    const novaData = new Date(data);
+    novaData.setDate(novaData.getDate() + 1);
+    return novaData;
 }
