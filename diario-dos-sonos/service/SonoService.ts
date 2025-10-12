@@ -3,6 +3,7 @@ import { MediaMesSono } from "@/models/MediaMesSono";
 import ArmazenamentoLocal from "./storage/ArmazenamentoLocal";
 import { DeviceEventEmitter, EmitterSubscription } from "react-native";
 import { Formatador } from "./Formatador";
+import { Calculadora } from "./Calculadora";
 
 export interface ISonoService {
     getSonoIsAtivo(): Promise<boolean>;
@@ -13,14 +14,16 @@ export interface ISonoService {
     iniciarIntervaloSono(): Promise<void>;
     pararIntervaloSono(): Promise<void>;
 
-    calcularMediaMesAtual(intervalos:IntervaloSono[]): Promise<MediaMesSono>;
+    editarIntervaloSono(intervaloSono: IntervaloSono): Promise<void>;
 
     emitirMudou(): void;
     onMudou(callback: () => void): EmitterSubscription;
 }
 
 export class SonoService implements ISonoService {
+
     private _armazenamento = new ArmazenamentoLocal();
+    private _calculadora = new Calculadora();
 
     private constructor(){}
     private static instance : SonoService;
@@ -71,10 +74,35 @@ export class SonoService implements ISonoService {
 
         this._armazenamento.setIntervalosSono(intervalos);
 
+        this.atualizarMediaMensal();
+        this.emitirMudou();
+    }
+
+    async atualizarMediaMensal():Promise<void>{
+        const intervalos = await this.getIntervalos();
+
         this._armazenamento.setMediasMes(
-            await this.calcularMediaMesAtual(intervalos)
+            this._calculadora.calcularMediaMesAtual(intervalos)
         );
-        
+    }
+
+    async editarIntervaloSono(intervaloSono: IntervaloSono):Promise<void> {
+        const intervalos = await this.getIntervalos();
+
+        const dataIntervalo = Formatador(intervaloSono.horaFim).data;
+
+        const novosIntervalos = intervalos.map(i => {
+            const dataI = Formatador(i.horaFim).data;
+            
+            if (dataI === dataIntervalo){
+                return intervaloSono;
+            }
+
+            return i;
+        });
+
+        this._armazenamento.setIntervalosSono(novosIntervalos);
+        this.atualizarMediaMensal();
         this.emitirMudou();
     }
 
@@ -87,40 +115,12 @@ export class SonoService implements ISonoService {
         );
 
         this._armazenamento.setIntervalosSono(novosIntervalos);
+        this.atualizarMediaMensal();
         this.emitirMudou();
     }
 
     async getIntervalos(): Promise<IntervaloSono[]> {
         return await this._armazenamento.getIntervalos();
-    }
-
-    async calcularMediaMesAtual(intervalos:IntervaloSono[]) : Promise<MediaMesSono> {
-        const agora = new Date();
-
-        const intervalosDoMes = intervalos.filter(i => 
-            i.horaInicio.getMonth() === agora.getMonth() &&
-            i.horaInicio.getFullYear() === agora.getFullYear()
-        );
-
-        if (intervalosDoMes.length === 0){
-            return {
-                horas: 0,
-                minutos: 0
-            };
-        }
-
-        let media = 0;
-
-        for (let i = 0; i < intervalosDoMes.length; i++) {
-            const intervalo = intervalosDoMes[i];
-            const diferenca = intervalo.horaFim.getTime() - intervalo.horaInicio.getTime();
-            media += diferenca;
-        }
-
-        return {
-            horas: Math.floor((media / intervalosDoMes.length) / (1000 * 60 * 60)),
-            minutos: Math.floor(((media / intervalosDoMes.length) % (1000 * 60 * 60)) / (1000 * 60))
-        };
     }
 
     emitirMudou():void{
