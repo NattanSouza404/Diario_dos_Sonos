@@ -1,4 +1,4 @@
-import { diferencaEntreDatas, Formatador } from "@/service/Formatador";
+import { avancarUmDia, diferencaEntreDatas, Formatador } from "@/service/Formatador";
 
 describe('Formatador', () => {
   test('formata corretamente a data', () => {
@@ -31,7 +31,18 @@ describe('Formatador', () => {
       {
         horas: 2,
         minutos: 15,
-        segundos: 5
+        segundos: 5,
+        duracaoEmExtenso: "2h, 15m e 5s"
       });
+  });
+
+  test('avança corretamente uma data em um dia', () => {
+    const data = new Date('2024-06-15T14:30:45');
+    const novaData = avancarUmDia(data);
+
+    expect(novaData.getFullYear()).toBe(2024);
+    expect(novaData.getMonth()).toBe(5); // mês 0-based => junho = 5
+    expect(novaData.getDate()).toBe(16);
+    expect(novaData.getHours()).toBe(14);
   });
 });
