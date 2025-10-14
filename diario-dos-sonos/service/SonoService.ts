@@ -4,6 +4,7 @@ import ArmazenamentoLocal from "./storage/ArmazenamentoLocal";
 import { DeviceEventEmitter, EmitterSubscription } from "react-native";
 import { Formatador } from "./Formatador";
 import { Calculadora } from "./Calculadora";
+import { validarSono } from "./ValidadorSono";
 
 export interface ISonoService {
     getSonoIsAtivo(): Promise<boolean>;
@@ -70,6 +71,8 @@ export class SonoService implements ISonoService {
             }
         });
 
+        validarSono(novoIntervalo);
+
         intervalos.push(novoIntervalo);
 
         this._armazenamento.setIntervalosSono(intervalos);
@@ -102,6 +105,7 @@ export class SonoService implements ISonoService {
         });
 
         this._armazenamento.setIntervalosSono(novosIntervalos);
+        validarSono(intervaloSono);
         this.atualizarMediaMensal();
         this.emitirMudou();
     }
