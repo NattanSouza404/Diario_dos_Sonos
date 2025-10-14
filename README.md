@@ -24,5 +24,11 @@ Os comandos usados para criar o projeto:
 npx create-expo-app@latest
 ```
 
+### Referências
+
+Documentação Expo:
+- [Build Setup](https://docs.expo.dev/build/setup/)
+- [Build Reference - APK](https://docs.expo.dev/build-reference/apk/)
+
 ### Créditos
 Ícone de travesseiro: <a href="https://www.flaticon.com/free-icons/pillow" title="pillow icons">Pillow icons created by Freepik - Flaticon</a>
