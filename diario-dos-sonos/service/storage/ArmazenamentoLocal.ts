@@ -59,7 +59,11 @@ export default class ArmazenamentoLocal {
     }
 
     async setIntervalosSono(intervalos: IntervaloSono[]): Promise<void> {
-        AsyncStorage.setItem(Chaves.INTERVALOS_SONO, JSON.stringify(intervalos));
+        const intervalosOrdenados = intervalos.sort(
+            (a, b) => b.horaFim.getTime() - a.horaFim.getTime()
+        );
+
+        AsyncStorage.setItem(Chaves.INTERVALOS_SONO, JSON.stringify(intervalosOrdenados));
     }
 
     async getMediaMes(): Promise<MediaMesSono> {
