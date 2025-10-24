@@ -55,19 +55,12 @@ export class SonoService implements ISonoService {
         await this._armazenamento.setUltimaMarcacao(date);
     }
 
-    async pararIntervaloSono(): Promise<void> {
-        const date = new Date(Date.now()).toISOString();
-
-        const novoIntervalo = new IntervaloSono(
-            await this._armazenamento.getUltimaMarcacao(),
-            new Date(date)
-        );
-
+    async adicionarIntervaloSono(novoIntervalo: IntervaloSono){
         const intervalos = await this.getIntervalos();
 
         intervalos.forEach(i => {
             if (Formatador(i.horaInicio).data === Formatador(novoIntervalo.horaInicio).data){
-                throw new Error("Já existe um intervalo de sono para o dia de hoje.");
+                throw new Error("Já existe um intervalo de sono para esse dia.");
             }
         });
 
@@ -79,6 +72,17 @@ export class SonoService implements ISonoService {
 
         this.atualizarMediaMensal();
         this.emitirMudou();
+    }
+
+    async pararIntervaloSono(): Promise<void> {
+        const date = new Date(Date.now()).toISOString();
+
+        const novoIntervalo = new IntervaloSono(
+            await this._armazenamento.getUltimaMarcacao(),
+            new Date(date)
+        );
+
+        this.adicionarIntervaloSono(novoIntervalo);
     }
 
     async atualizarMediaMensal():Promise<void>{
