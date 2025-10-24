@@ -2,15 +2,20 @@ import { diferencaEntreDatas, Formatador } from "@/service/Formatador";
 import { ThemedText } from "./themed-text"
 import { ThemedView } from "./themed-view"
 import IntervaloSono from "@/models/IntervaloSono";
-import { Pressable } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 import { AlertUtils } from "@/utils/AlertUtils";
 import { SonoService } from "@/service/SonoService";
+
+import { useState } from "react";
+import ModalEditarIntervaloSono from "./modal/modal-editar-intervalo-sono";
 
 type Props = {
     intervaloSono: IntervaloSono,
 }
 
 export const MarcacaoSono = ({intervaloSono }:Props) => {
+
+    const [modalIsVisible, setModalIsVisible] = useState(false);
 
     const horaInicio = intervaloSono.horaInicio;
     const horaFim = intervaloSono.horaFim;
@@ -31,16 +36,42 @@ export const MarcacaoSono = ({intervaloSono }:Props) => {
     }
 
     return (
-        <ThemedView style={{ backgroundColor: 'white'}}>
-            <ThemedText type='title'>{fmtInicio.mes} {fmtInicio.ano}</ThemedText>
-            <ThemedText>{fmtInicio.mes} {fmtInicio.dia} ({fmtInicio.diaSemana})</ThemedText>
-            <ThemedText>{diffInicioEFim.horas} horas e {diffInicioEFim.minutos} minutos</ThemedText>
-            <ThemedText>{fmtInicio.horario} - {fmtFim.horario}</ThemedText>
-            <ThemedText>Média Semanal</ThemedText>
-            <ThemedText>Qualidade de sono: Boa</ThemedText>
+        <ThemedView style={styles.marcacaoSono}>
+            <ThemedText type='title' style={styles.texto}>{fmtInicio.mes} {fmtInicio.ano}</ThemedText>
+            <ThemedText style={styles.texto}>{fmtInicio.mes} {fmtInicio.dia} ({fmtInicio.diaSemana})</ThemedText>
+            <ThemedText style={styles.texto}>{diffInicioEFim.duracaoEmExtenso}</ThemedText>
+            <ThemedText style={styles.texto}>{fmtInicio.horario} - {fmtFim.horario}</ThemedText>
+            <ThemedText style={styles.texto}>Média Semanal</ThemedText>
+            <ThemedText style={styles.texto}>Qualidade de sono: Boa</ThemedText>
             <Pressable onPress={() => deletarIntervalo(intervaloSono)}>
-                X
+                <ThemedText style={styles.textoVermelho}>X</ThemedText>
             </Pressable>
+            <Pressable onPress={() => {
+                setModalIsVisible(true);
+            }}>
+                <ThemedText style={styles.textoVermelho}>Editar</ThemedText>
+            </Pressable>
+           <ModalEditarIntervaloSono
+                isVisible={modalIsVisible}
+                setIsVisible={setModalIsVisible}
+                intervaloSono={intervaloSono}
+           />
         </ThemedView>
     );
 }
+
+const styles = StyleSheet.create({
+    marcacaoSono: {
+        margin: 8,
+        padding: 8,
+        backgroundColor: "white",
+        borderRadius: 20,
+        color: "black",
+    },
+    texto: {
+        color: "black"
+    },
+    textoVermelho: {
+        color: "red"
+    }
+})
