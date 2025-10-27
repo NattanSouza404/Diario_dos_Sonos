@@ -7,8 +7,8 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
-export function Collapsible({ children, title }: PropsWithChildren & { title: string }) {
-  const [isOpen, setIsOpen] = useState(false);
+export function Collapsible({ children, title, isAberto = false }: PropsWithChildren & { title: string, isAberto?: boolean }) {
+  const [isOpen, setIsOpen] = useState(isAberto);
   const theme = useColorScheme() ?? 'light';
 
   return (
@@ -40,6 +40,6 @@ const styles = StyleSheet.create({
   },
   content: {
     marginTop: 6,
-    marginLeft: 24,
+    //marginLeft: 24,
   },
 });
