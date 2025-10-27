@@ -10,6 +10,7 @@ import { ThemedView } from "../themed-view";
 
 import { StyleSheet } from 'react-native';
 import { SelecaoDateTime } from "../selecao-date-time";
+import { Colors } from "@/constants/theme";
 
 type Props = {
     isVisible: boolean,
@@ -41,10 +42,10 @@ export const ModalAdicionarIntervaloSono = ({setIsVisible, isVisible}:Props) => 
                 const service = SonoService.getInstance();
 
                 await service.adicionarIntervaloSono(intervalo);
+
+                setIsVisible(false);
             } catch(error) {
                 AlertUtils.alert((error as Error).message);
-            } finally {
-                setIsVisible(false);
             }
         });
     };
@@ -132,7 +133,7 @@ const styles = StyleSheet.create(
             padding: 4
         },
         textoVermelho: {
-            color: "red"
+            color: Colors.dark.vermelho
         },
     }
 );

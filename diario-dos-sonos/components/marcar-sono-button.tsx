@@ -14,7 +14,7 @@ export const MarcarSonoButton = ( {sonoIsAtivo, onPress }: Props ) => {
             onPress={onPress}
             style={[
                 styles.marcarSonoButton,
-                { backgroundColor: sonoIsAtivo ? 'red' : 'green' }
+                { backgroundColor: sonoIsAtivo ? '#FFC107' : 'green' }
             ]}
         >
             <ThemedText>

@@ -64,7 +64,7 @@ export const MarcacaoSono = ({intervaloSono }:Props) => {
                 </Pressable>
 
                 <Pressable onPress={() => setModalIsVisible(true)}>
-                    <Ionicons name="pencil" size={24} color={'black'} />
+                    <Ionicons name="pencil" size={24} color={'#2e61beff'} />
                 </Pressable>
 
             </ThemedView>

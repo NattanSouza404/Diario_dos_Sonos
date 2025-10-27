@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { StyleSheet } from 'react-native';
 import { ThemedView } from "../themed-view";
 import { SelecaoDateTime } from "../selecao-date-time";
+import { Colors } from "@/constants/theme";
 
 type Props = {
     isVisible: boolean,
@@ -42,12 +43,11 @@ export const ModalEditarIntervaloSono = ({intervaloSono, setIsVisible, isVisible
 
                 const service = SonoService.getInstance();
 
-
                 await service.editarIntervaloSono(intervalo);
+
+                setIsVisible(false);
             } catch(error) {
                 AlertUtils.alert((error as Error).message);
-            } finally {
-                setIsVisible(false);
             }
         });
     };
@@ -137,7 +137,7 @@ const styles = StyleSheet.create(
             padding: 4
         },
         textoVermelho: {
-            color: "red"
+            color: Colors.dark.vermelho
         },
     }
 );
