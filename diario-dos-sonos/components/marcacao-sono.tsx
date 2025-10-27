@@ -8,12 +8,16 @@ import { SonoService } from "@/service/SonoService";
 
 import { useState } from "react";
 import ModalEditarIntervaloSono from "./modal/modal-editar-intervalo-sono";
+import { Ionicons } from "@expo/vector-icons";
+import { useThemeColor } from "@/hooks/use-theme-color";
 
 type Props = {
     intervaloSono: IntervaloSono,
 }
 
 export const MarcacaoSono = ({intervaloSono }:Props) => {
+
+    const vermelho = useThemeColor({}, 'vermelho');
 
     const [modalIsVisible, setModalIsVisible] = useState(false);
 
@@ -36,42 +40,90 @@ export const MarcacaoSono = ({intervaloSono }:Props) => {
     }
 
     return (
-        <ThemedView style={styles.marcacaoSono}>
-            <ThemedText type='title' style={styles.texto}>{fmtInicio.mes} {fmtInicio.ano}</ThemedText>
-            <ThemedText style={styles.texto}>{fmtInicio.mes} {fmtInicio.dia} ({fmtInicio.diaSemana})</ThemedText>
-            <ThemedText style={styles.texto}>{diffInicioEFim.duracaoEmExtenso}</ThemedText>
-            <ThemedText style={styles.texto}>{fmtInicio.horario} - {fmtFim.horario}</ThemedText>
-            <ThemedText style={styles.texto}>Média Semanal</ThemedText>
-            <ThemedText style={styles.texto}>Qualidade de sono: Boa</ThemedText>
-            <Pressable onPress={() => deletarIntervalo(intervaloSono)}>
-                <ThemedText style={styles.textoVermelho}>X</ThemedText>
-            </Pressable>
-            <Pressable onPress={() => {
-                setModalIsVisible(true);
-            }}>
-                <ThemedText style={styles.textoVermelho}>Editar</ThemedText>
-            </Pressable>
+        <ThemedView style={styles.marcacaoSono} backgroundIsSecondary={true} hasBorder={true}>
+
+            <ThemedView style={styles.containerTitulo} backgroundIsSecondary={true}>
+                <ThemedText style={styles.titulo}>
+                    {fmtFim.dia}
+                </ThemedText>
+
+                <ThemedText style={styles.textoSubtitle}>
+                    {fmtFim.diaSemana}
+                </ThemedText>
+            </ThemedView>
+
+            <ThemedView style={styles.infoSono} backgroundIsSecondary={true}>
+                <ThemedText style={styles.texto}>{diffInicioEFim.duracaoEmExtenso}</ThemedText>
+                <ThemedText style={styles.texto}>{fmtInicio.horario} - {fmtFim.horario}</ThemedText>
+            </ThemedView>
+
+            <ThemedView style={styles.navBotoes} backgroundIsSecondary={true}>
+
+                <Pressable onPress={() => deletarIntervalo(intervaloSono)}>
+                    <Ionicons size={24} name="trash-bin-sharp" color={vermelho} />
+                </Pressable>
+
+                <Pressable onPress={() => setModalIsVisible(true)}>
+                    <Ionicons name="pencil" size={24} color={'black'} />
+                </Pressable>
+
+            </ThemedView>
+
            <ModalEditarIntervaloSono
                 isVisible={modalIsVisible}
                 setIsVisible={setModalIsVisible}
                 intervaloSono={intervaloSono}
            />
+
         </ThemedView>
     );
 }
 
 const styles = StyleSheet.create({
     marcacaoSono: {
-        margin: 8,
-        padding: 8,
-        backgroundColor: "white",
+        margin: 4,
+        padding: 4,
         borderRadius: 20,
-        color: "black",
+
+        borderWidth: 2,
+    },
+    containerTitulo: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+
+        marginTop: 6,
+        marginBottom: 4,
+    },
+    titulo: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        lineHeight: 32,
+        textAlign: 'center'
+    },
+    infoSono: {
+        alignItems: "center",
+        marginTop: 16,
+        marginBottom: 16,
     },
     texto: {
-        color: "black"
+        textAlign: "center"
+    },
+    textoSubtitle: {
+        textAlign: "center",
+        fontSize: 16,
     },
     textoVermelho: {
         color: "red"
-    }
+    },
+    navBotoes: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between', 
+        padding: 4,
+
+        marginLeft: 6,
+        marginRight: 6
+    },
 })
