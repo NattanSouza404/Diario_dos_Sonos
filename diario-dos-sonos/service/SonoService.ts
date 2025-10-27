@@ -1,5 +1,5 @@
 import IntervaloSono from "@/models/IntervaloSono";
-import { MediaMesSono } from "@/models/MediaMesSono";
+import MediaSono from "@/models/MediaSono";
 import ArmazenamentoLocal from "./storage/ArmazenamentoLocal";
 import { DeviceEventEmitter, EmitterSubscription } from "react-native";
 import { Formatador } from "./Formatador";
@@ -8,7 +8,8 @@ import { validarSono } from "./ValidadorSono";
 
 export interface ISonoService {
     getSonoIsAtivo(): Promise<boolean>;
-    getMediaMensal(): Promise<MediaMesSono>;
+    getMediaMensal(): Promise<MediaSono>;
+    getMediaSemanal(): Promise<MediaSono>;
     setSonoIsAtivo(novoSonoIsAtivo: boolean): Promise<void>;
     getIntervalos(): IntervaloSono[] | Promise<IntervaloSono[]>;
 
@@ -41,8 +42,12 @@ export class SonoService implements ISonoService {
         return this._armazenamento.getSonoIsAtivo();
     }
 
-    async getMediaMensal(): Promise<MediaMesSono> {
+    async getMediaMensal(): Promise<MediaSono> {
         return await this._armazenamento.getMediaMes();
+    }
+
+    async getMediaSemanal(): Promise<MediaSono> {
+        return await this._armazenamento.getMediaSemana();
     }
 
     async setSonoIsAtivo(novoSonoIsAtivo: boolean): Promise<void> {
@@ -59,7 +64,7 @@ export class SonoService implements ISonoService {
         const intervalos = await this.getIntervalos();
 
         intervalos.forEach(i => {
-            if (Formatador(i.horaInicio).data === Formatador(novoIntervalo.horaInicio).data){
+            if (Formatador(i.horaFim).data === Formatador(novoIntervalo.horaFim).data){
                 throw new Error("Já existe um intervalo de sono para esse dia.");
             }
         });
@@ -70,7 +75,7 @@ export class SonoService implements ISonoService {
 
         this._armazenamento.setIntervalosSono(intervalos);
 
-        this.atualizarMediaMensal();
+        this.atualizarEstatisticas();
         this.emitirMudou();
     }
 
@@ -93,6 +98,14 @@ export class SonoService implements ISonoService {
         );
     }
 
+    async atualizarMediaSemanal():Promise<void>{
+        const intervalos = await this.getIntervalos();
+
+        this._armazenamento.setMediasSemana(
+            this._calculadora.calcularMediaSemanaAtual(intervalos)
+        );
+    }
+
     async editarIntervaloSono(intervaloSono: IntervaloSono):Promise<void> {
         const intervalos = await this.getIntervalos();
 
@@ -110,7 +123,7 @@ export class SonoService implements ISonoService {
 
         this._armazenamento.setIntervalosSono(novosIntervalos);
         validarSono(intervaloSono);
-        this.atualizarMediaMensal();
+        this.atualizarEstatisticas();
         this.emitirMudou();
     }
 
@@ -123,12 +136,17 @@ export class SonoService implements ISonoService {
         );
 
         this._armazenamento.setIntervalosSono(novosIntervalos);
-        this.atualizarMediaMensal();
+        this.atualizarEstatisticas();
         this.emitirMudou();
     }
 
     async getIntervalos(): Promise<IntervaloSono[]> {
         return await this._armazenamento.getIntervalos();
+    }
+
+    async atualizarEstatisticas(): Promise<void> {
+        this.atualizarMediaMensal();
+        this.atualizarMediaSemanal();
     }
 
     emitirMudou():void{

@@ -1,12 +1,13 @@
 import IntervaloSono from "@/models/IntervaloSono";
-import { MediaMesSono } from "@/models/MediaMesSono";
+import MediaSono  from "@/models/MediaSono";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Chaves = {
     INTERVALOS_SONO: "intervalosSono",
     SONO_IS_ATIVO: "sonoIsAtivo",
     ULTIMA_MARCACAO: "ultimaMarcacao",
-    MEDIA_MES: "mediaMes"
+    MEDIA_MES: "mediaMes",
+    MEDIA_SEMANA: "mediaSemana"
 }
 
 export default class ArmazenamentoLocal {
@@ -66,18 +67,32 @@ export default class ArmazenamentoLocal {
         AsyncStorage.setItem(Chaves.INTERVALOS_SONO, JSON.stringify(intervalosOrdenados));
     }
 
-    async getMediaMes(): Promise<MediaMesSono> {
+    async getMediaMes(): Promise<MediaSono> {
         let media = await AsyncStorage.getItem(Chaves.MEDIA_MES);
 
         if (!media || media === 'undefined'){
             media = await this.inicializar(Chaves.MEDIA_MES);
         }
 
-        return JSON.parse(media) as MediaMesSono;
+        return JSON.parse(media) as MediaSono;
     }
 
-    async setMediasMes(media:MediaMesSono){
+    async getMediaSemana(): Promise<MediaSono> {
+        let media = await AsyncStorage.getItem(Chaves.MEDIA_SEMANA);
+
+        if (!media || media === 'undefined'){
+            media = await this.inicializar(Chaves.MEDIA_SEMANA);
+        }
+
+        return JSON.parse(media) as MediaSono;
+    }
+
+    async setMediasMes(media:MediaSono){
         AsyncStorage.setItem(Chaves.MEDIA_MES, JSON.stringify(media));
+    }
+
+    async setMediasSemana(media:MediaSono){
+        AsyncStorage.setItem(Chaves.MEDIA_SEMANA, JSON.stringify(media));
     }
 
     private async inicializar(chave:string): Promise<string> {
@@ -94,7 +109,7 @@ export default class ArmazenamentoLocal {
                 return JSON.stringify(intervalosPadrao);
 
             case Chaves.MEDIA_MES:
-                const mediaPadrao:MediaMesSono = {
+                const mediaPadrao:MediaSono = {
                     horas: 0, minutos: 0
                 }
 
@@ -117,6 +132,15 @@ export default class ArmazenamentoLocal {
                 AsyncStorage.setItem(Chaves.ULTIMA_MARCACAO, ultimaMarcacaoPadrao);
                 
                 return JSON.stringify(ultimaMarcacaoPadrao);
+
+            case Chaves.MEDIA_SEMANA:
+                const mediaSemanaPadrao:MediaSono = {
+                    horas: 0, minutos: 0
+                }
+
+                AsyncStorage.setItem(Chaves.MEDIA_SEMANA, JSON.stringify(mediaSemanaPadrao));
+
+                return JSON.stringify(mediaSemanaPadrao);
         }
 
         throw new Error(`Chave não encontrada: ${chave}`);
