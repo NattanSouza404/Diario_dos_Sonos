@@ -87,7 +87,7 @@ export class SonoService implements ISonoService {
             new Date(date)
         );
 
-        this.adicionarIntervaloSono(novoIntervalo);
+        await this.adicionarIntervaloSono(novoIntervalo);
     }
 
     async atualizarMediaMensal():Promise<void>{
