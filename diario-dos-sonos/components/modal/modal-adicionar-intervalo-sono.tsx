@@ -1,15 +1,15 @@
 import { AlertUtils } from "@/utils/AlertUtils";
-import DatePicker from "../date-picker";
 import IntervaloSono from "@/models/IntervaloSono";
-import { Pressable, TouchableOpacity } from "react-native";
+import { Pressable } from "react-native";
 import { ThemedText } from "../themed-text";
 import CustomModal from "./custom-modal";
-import { Formatador, retrocederUmDia } from "@/service/Formatador";
+import { Formatador } from "@/service/Formatador";
 import { SonoService } from "@/service/SonoService";
 import { useEffect, useState } from "react";
 import { ThemedView } from "../themed-view";
 
 import { StyleSheet } from 'react-native';
+import { SelecaoDateTime } from "../selecao-date-time";
 
 type Props = {
     isVisible: boolean,
@@ -20,16 +20,6 @@ export const ModalAdicionarIntervaloSono = ({setIsVisible, isVisible}:Props) => 
     const [horaInicio, setHoraInicio] = useState<Date>(new Date());
     const [horaFim, setHoraFim] = useState<Date>(new Date());
 
-    const [selected, setSelected] = useState(horaInicio);
-
-    const [opcoesData, setOpcoesData] = useState<Date[]>(
-        [retrocederUmDia(horaFim), horaFim]
-    );
-
-    useEffect(() => {
-        setOpcoesData([retrocederUmDia(horaFim), horaFim]);
-    }, [horaFim]);
-
     useEffect(() => {
         if (isVisible) {
             setHoraInicio(horaInicio);
@@ -37,11 +27,19 @@ export const ModalAdicionarIntervaloSono = ({setIsVisible, isVisible}:Props) => 
         }
     }, [isVisible]);
 
-    const confirmarAdicao = (intervalo:IntervaloSono) => {
+    const confirmarAdicao = () => {
         AlertUtils.confirm("Confirma as alterações?", async () => {
-            const service = SonoService.getInstance();
-
             try {
+                const intervalo = new IntervaloSono(
+                    horaInicio, horaFim
+                );
+
+                intervalo.horaInicio.setDate(horaInicio.getDate());
+                intervalo.horaInicio.setMonth(horaInicio.getMonth());
+                intervalo.horaInicio.setFullYear(horaInicio.getFullYear());
+
+                const service = SonoService.getInstance();
+
                 await service.adicionarIntervaloSono(intervalo);
             } catch(error) {
                 AlertUtils.alert((error as Error).message);
@@ -56,72 +54,49 @@ export const ModalAdicionarIntervaloSono = ({setIsVisible, isVisible}:Props) => 
             isVisible={isVisible}
             onClose={() => {}}
         >
-            {opcoesData.map((option) => (
-                <TouchableOpacity
-                    key={Formatador(option).data}
-                    onPress={() => setSelected(new Date(option))}
-                    style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 5 }}
-                    >
-                    <ThemedView style={styles.selecao}>
-                        {
-                            selected.getTime() === option.getTime() && (
-                                <ThemedView style={styles.selecaoSelecionada}/>
-                            )
-                        }
+            <ThemedView backgroundIsSecondary={true}> 
+                <ThemedText type="title" style={styles.titulo}>
+                    {Formatador(horaFim).data}
+                </ThemedText>
+
+                <ThemedView style={styles.mainContainer} backgroundIsSecondary={true}>
+                    <ThemedView style={styles.secao} backgroundIsSecondary={true}>
+                        <ThemedText type="subtitle" style={styles.subtitulo}>
+                            Início
+                        </ThemedText>
+
+                        <SelecaoDateTime
+                            hora={horaInicio}
+                            setHora={setHoraInicio}
+                        />
                     </ThemedView>
-                    <ThemedText style={styles.textoVermelho}>
-                        {Formatador(option).data}
-                    </ThemedText>
-                </TouchableOpacity>
-            ))}
 
-            <DatePicker
-                mode="time"
-                onConfirm={() => {}}
-                initialDate={horaInicio}
-                label={"Inicio: "+Formatador(selected).data}
-                valor={horaInicio}
-                setValor={setHoraInicio}
-            />
+                    <ThemedView style={styles.secao} backgroundIsSecondary={true}>
+                        <ThemedText type="subtitle" style={styles.subtitulo}>
+                            Fim
+                        </ThemedText>
 
-            <DatePicker
-                mode="date"
-                onConfirm={() => {}}
-                initialDate={horaFim}
-                label={"Final: "+Formatador(horaFim).data}
-                valor={horaFim}
-                setValor={setHoraFim}
-            />
+                        <SelecaoDateTime
+                            hora={horaFim}
+                            setHora={setHoraFim}
+                        />
 
-            <DatePicker
-                mode="time"
-                onConfirm={() => {}}
-                initialDate={horaFim}
-                label={"Final: "+Formatador(horaFim).data}
-                valor={horaFim}
-                setValor={setHoraFim}
-            />
+                    </ThemedView>
+                </ThemedView>
 
-            <Pressable onPress={() => {
-                setIsVisible(false)
-            }}>
-                <ThemedText style={styles.textoVermelho}>Cancelar</ThemedText>
-            </Pressable>
+                <ThemedView style={styles.navOpcoes} backgroundIsSecondary={true}>
+                    <Pressable onPress={() => setIsVisible(false)}>
+                        <ThemedText style={styles.textoVermelho}>
+                            Cancelar
+                        </ThemedText>
+                    </Pressable>
 
-            <Pressable onPress={() => {
-                const intervalo = new IntervaloSono(
-                    horaInicio, horaFim
-                );
+                    <Pressable onPress={() => confirmarAdicao()}>
+                        <ThemedText>OK</ThemedText>
+                    </Pressable>
+                </ThemedView>
 
-                intervalo.horaInicio.setDate(selected.getDate());
-                intervalo.horaInicio.setMonth(selected.getMonth());
-                intervalo.horaInicio.setFullYear(selected.getFullYear());
-
-                confirmarAdicao(intervalo);
-            }}
-            >
-                <ThemedText style={styles.textoVermelho}>OK</ThemedText>
-            </Pressable>
+            </ThemedView>
         </CustomModal>
     );
 }
@@ -130,24 +105,34 @@ export default ModalAdicionarIntervaloSono;
 
 const styles = StyleSheet.create(
     {
-        selecao: {
-            height: 20,
-            width: 20,
-            borderRadius: 10,
-            borderWidth: 2,
-            borderColor: '#555',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginRight: 10,
+        titulo: {
+            textAlign: 'center'
         },
-        selecaoSelecionada: {
-            height: 10,
-            width: 10,
-            borderRadius: 5,
-            backgroundColor: '#555',
+        subtitulo: {
+            textAlign: "center"
+        },
+        mainContainer: {
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-around',
+        },
+        secao: {
+            display: 'flex',
+            alignItems: 'center',
+
+            marginTop: 8,
+            marginBottom: 8
+        },
+        navOpcoes: {
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-around',
+            width: '100%',
+            marginTop: 8,
+            padding: 4
         },
         textoVermelho: {
             color: "red"
-        }
+        },
     }
 );

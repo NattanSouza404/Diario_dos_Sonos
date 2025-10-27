@@ -21,7 +21,9 @@ export default function CustomModal({ isVisible: visible, onClose, children }: C
       </TouchableWithoutFeedback>
 
       <ThemedView style={styles.centered}>
-        <ThemedView style={styles.modal}>{children}</ThemedView>
+        <ThemedView style={styles.modal} backgroundIsSecondary={true} hasBorder={true}>
+          {children}
+        </ThemedView>
       </ThemedView>
     </Modal>
   );
@@ -42,7 +44,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modal: {
-    backgroundColor: '#fff',
+    borderWidth: 2,
     padding: 20,
     borderRadius: 12,
     width: '80%',
