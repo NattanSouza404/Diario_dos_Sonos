@@ -45,3 +45,6 @@ app-example
 # ide
 .vscode/
 .idea/
+
+# test
+/coverage/
