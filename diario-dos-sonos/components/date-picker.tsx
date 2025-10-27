@@ -9,15 +9,17 @@ type Props = {
   label?: string;
   valor: Date;
   setValor: (date:Date) => void;
+  disabled?: boolean;
 };
 
 export default function DatePicker({
   mode = 'date',
   initialDate,
   onConfirm,
-  label = 'Selecionar data',
+  label = '',
   valor,
-  setValor
+  setValor,
+  disabled = false,
 }: Props) {
   const [visible, setVisible] = useState(false);
 
@@ -46,6 +48,7 @@ export default function DatePicker({
               : valor.toLocaleDateString('pt-BR')
           }
           onPress={() => setVisible(true)}
+          disabled={disabled}
         />
 
         <DateTimePickerModal
@@ -67,6 +70,7 @@ export default function DatePicker({
       <View style={stylesWeb.container}>
         <Text>{label}</Text>
         <input
+          disabled={disabled}
           type={inputType}
           value={
             mode === 'time'
@@ -112,17 +116,20 @@ export default function DatePicker({
 const styles = StyleSheet.create({
   container: {
     marginVertical: 8,
+    width: 120
   },
 });
 
 const stylesWeb = {
   container: {
     marginVertical: 8,
+    width: 180,
   },
   input: {
     padding: 8,
     borderRadius: 8,
     border: '1px solid #ccc',
     fontSize: 16,
+    width: '80%',
   }
 }
