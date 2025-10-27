@@ -117,14 +117,14 @@ export default function HomeScreen() {
           </ThemedView>
 
           <ThemedView style={styles.container}>
-            <ThemedText>Média de sono da semana</ThemedText>
+            <ThemedText>Média da semana</ThemedText>
             <ThemedText type='subtitle'>
               {mediaSemana.horas} horas e {mediaSemana.minutos} minutos
             </ThemedText>
           </ThemedView>
 
           <ThemedView style={styles.container}>
-            <ThemedText>Média de sono desse mês</ThemedText>
+            <ThemedText>Média do mês</ThemedText>
             <ThemedText type='subtitle'>
               {mediaMes.horas} horas e {mediaMes.minutos} minutos
             </ThemedText>
