@@ -6,14 +6,15 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 
 import { useEffect, useState } from 'react';
 
-import IntervaloSono from '@/models/IntervaloSono';
+import IntervaloSono from '@/domain/models/IntervaloSono';
 
-import { MarcacaoSono } from '@/components/marcacao-sono';
-import { SonoService } from '@/service/SonoService';
+import { MarcacaoSono } from '@/features/sono/components/marcacao-sono';
+import { SonoService } from '@/domain/service/SonoService';
 
 import { Collapsible } from '@/components/ui/collapsible';
-import { Formatador } from '@/service/Formatador';
-import AdicionarSonoButtton from '@/components/adicionar-sono-button';
+
+import AdicionarSonoButtton from '@/features/sono/components/adicionar-sono-button';
+import { Formatador } from '@/utils/DataUtils';
 
 export default function HistoryScreen() {
   const service = SonoService.getInstance();
