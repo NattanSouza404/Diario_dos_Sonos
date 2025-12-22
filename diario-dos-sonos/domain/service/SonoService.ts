@@ -1,10 +1,10 @@
-import IntervaloSono from "@/models/IntervaloSono";
-import MediaSono from "@/models/MediaSono";
-import ArmazenamentoLocal from "./storage/ArmazenamentoLocal";
+import IntervaloSono from "@/domain/models/IntervaloSono";
+import MediaSono from "@/domain/models/MediaSono";
+import ArmazenamentoLocal from "../../storage/ArmazenamentoLocal";
 import { DeviceEventEmitter, EmitterSubscription } from "react-native";
-import { Formatador } from "./Formatador";
 import { Calculadora } from "./Calculadora";
-import { validarSono } from "./ValidadorSono";
+import { validarSono } from "../validator/ValidadorSono";
+import { Formatador } from "@/utils/DataUtils";
 
 export interface ISonoService {
     getSonoIsAtivo(): Promise<boolean>;

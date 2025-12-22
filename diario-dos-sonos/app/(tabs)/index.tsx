@@ -4,10 +4,10 @@ import { Pressable, StyleSheet } from 'react-native';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import MarcarSonoButton from '../../components/marcar-sono-button';
+import MarcarSonoButton from '../../features/sono/components/marcar-sono-button';
 import { useEffect, useState } from 'react';
 
-import { ISonoService, SonoService } from '@/service/SonoService';
+import { ISonoService, SonoService } from '@/domain/service/SonoService';
 import { AlertUtils } from '@/utils/AlertUtils';
 import { IconeTravesseiro } from '@/components/icons/IconeTravesseiro';
 import { Ionicons } from '@expo/vector-icons';
