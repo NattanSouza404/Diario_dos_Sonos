@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, StyleSheet, TouchableWithoutFeedback } from 'react-native';
-import { ThemedView } from '../themed-view';
+import { ThemedView } from './themed-view';
 
 interface CustomModalProps {
   isVisible: boolean;

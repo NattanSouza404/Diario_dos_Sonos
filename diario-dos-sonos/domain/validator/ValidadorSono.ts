@@ -1,5 +1,5 @@
-import IntervaloSono from "@/models/IntervaloSono";
-import { diferencaEntreDatas } from "./Formatador";
+import IntervaloSono from "@/domain/models/IntervaloSono";
+import { diferencaEntreDatas } from "@/utils/DataUtils";
 
 export const validarSono = (intervalo: IntervaloSono): void => {
     if (intervalo.horaFim <= intervalo.horaInicio) {

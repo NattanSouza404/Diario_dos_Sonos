@@ -1,16 +1,17 @@
 import { AlertUtils } from "@/utils/AlertUtils";
-import IntervaloSono from "@/models/IntervaloSono";
+import IntervaloSono from "@/domain/models/IntervaloSono";
 import { Pressable } from "react-native";
-import { ThemedText } from "../themed-text";
-import CustomModal from "./custom-modal";
-import { Formatador } from "@/service/Formatador";
-import { SonoService } from "@/service/SonoService";
+
+import { SonoService } from "@/domain/service/SonoService";
 import { useEffect, useState } from "react";
-import { ThemedView } from "../themed-view";
 
 import { StyleSheet } from 'react-native';
-import { SelecaoDateTime } from "../selecao-date-time";
 import { Colors } from "@/constants/theme";
+import { Formatador } from "@/utils/DataUtils";
+import CustomModal from "@/components/custom-modal";
+import { ThemedView } from "@/components/themed-view";
+import { SelecaoDateTime } from "@/components/selecao-date-time";
+import { ThemedText } from "@/components/themed-text";
 
 type Props = {
     isVisible: boolean,

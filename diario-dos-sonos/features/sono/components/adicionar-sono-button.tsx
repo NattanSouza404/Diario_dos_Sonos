@@ -4,9 +4,9 @@ import { useState } from "react";
 import { Pressable } from "react-native";
 
 import { StyleSheet } from 'react-native';
-import ModalAdicionarIntervaloSono from "./modal/modal-adicionar-intervalo-sono";
-import { ThemedView } from "./themed-view";
+import { ThemedView } from "../../../components/themed-view";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import ModalAdicionarIntervaloSono from "./modal-adicionar-intervalo-sono";
 
 export const AdicionarSonoButton = () => {
     const [modalIsVisible, setModalIsVisible] = useState<boolean>(false);

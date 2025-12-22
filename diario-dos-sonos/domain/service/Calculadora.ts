@@ -1,5 +1,5 @@
-import IntervaloSono from "@/models/IntervaloSono";
-import MediaSono from "@/models/MediaSono";
+import IntervaloSono from "@/domain/models/IntervaloSono";
+import MediaSono from "@/domain/models/MediaSono";
 
 export class Calculadora {
 
@@ -29,7 +29,7 @@ export class Calculadora {
         return {
             horas: Math.floor((media / intervalosDoMes.length) / (1000 * 60 * 60)),
             minutos: Math.floor(((media / intervalosDoMes.length) % (1000 * 60 * 60)) / (1000 * 60))
-        };
+        } as MediaSono;
     }
 
     calcularMediaSemanaAtual(intervalos:IntervaloSono[]) : MediaSono {
@@ -47,7 +47,7 @@ export class Calculadora {
             return {
                 horas: 0,
                 minutos: 0
-            };
+            } as MediaSono;
         }
 
         let media = 0;
@@ -61,7 +61,7 @@ export class Calculadora {
         return {
             horas: Math.floor((media / intervalosDaSemana.length) / (1000 * 60 * 60)),
             minutos: Math.floor(((media / intervalosDaSemana.length) % (1000 * 60 * 60)) / (1000 * 60))
-        };
+        } as MediaSono;
     }
     
 }

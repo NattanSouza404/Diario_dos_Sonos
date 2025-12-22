@@ -1,15 +1,16 @@
-import { diferencaEntreDatas, Formatador } from "@/service/Formatador";
-import { ThemedText } from "./themed-text"
-import { ThemedView } from "./themed-view"
-import IntervaloSono from "@/models/IntervaloSono";
+import { diferencaEntreDatas, Formatador } from "@/utils/DataUtils";
+import { ThemedText } from "../../../components/themed-text"
+import { ThemedView } from "../../../components/themed-view"
+import IntervaloSono from "@/domain/models/IntervaloSono";
 import { Pressable, StyleSheet } from "react-native";
 import { AlertUtils } from "@/utils/AlertUtils";
-import { SonoService } from "@/service/SonoService";
+import { SonoService } from "@/domain/service/SonoService";
 
 import { useState } from "react";
-import ModalEditarIntervaloSono from "./modal/modal-editar-intervalo-sono";
-import { Ionicons } from "@expo/vector-icons";
+
 import { useThemeColor } from "@/hooks/use-theme-color";
+import ModalEditarIntervaloSono from "./modal-editar-intervalo-sono";
+import { Ionicons } from "@expo/vector-icons";
 
 type Props = {
     intervaloSono: IntervaloSono,
