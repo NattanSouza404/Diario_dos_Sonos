@@ -52,19 +52,9 @@ export default function HomeScreen() {
   }
 
   const handleConfirmacao = async () => {
-    const novoSonoIsAtivo = !sonoIsAtivo;
-
     try {
-
-      if (novoSonoIsAtivo){
-        await service.iniciarIntervaloSono();
-      } else {
-        await service.pararIntervaloSono();
-      }
-
-      setSonoIsAtivo(novoSonoIsAtivo);
-      service.setSonoIsAtivo(novoSonoIsAtivo);
-
+      await service.toggleMarcacaoSono();
+      setSonoIsAtivo(await service.getSonoIsAtivo());
     } catch (error) {
       AlertUtils.alert((error as Error).message);
     }
