@@ -1,6 +1,6 @@
 import { avancarUmDia, diferencaEntreDatas, Formatador, retrocederUmDia } from "@/utils/DataUtils";
 
-describe('Formatador', () => {
+describe('DataUtils', () => {
   test('formata corretamente a data', () => {
     const data = new Date('2024-06-15T14:30:45');
     const formatacao = Formatador(data); 
