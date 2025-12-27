@@ -13,8 +13,7 @@ export interface ISonoService {
     setSonoIsAtivo(novoSonoIsAtivo: boolean): Promise<void>;
     getIntervalos(): IntervaloSono[] | Promise<IntervaloSono[]>;
 
-    iniciarIntervaloSono(): Promise<void>;
-    pararIntervaloSono(): Promise<void>;
+    toggleMarcacaoSono(): Promise<void>;
 
     editarIntervaloSono(intervaloSono: IntervaloSono): Promise<void>;
 
@@ -88,6 +87,14 @@ export class SonoService implements ISonoService {
         );
 
         await this.adicionarIntervaloSono(novoIntervalo);
+    }
+
+    async toggleMarcacaoSono(): Promise<void> {
+      if (await this.getSonoIsAtivo()){
+        await this.iniciarIntervaloSono();
+      } else {
+        await this.pararIntervaloSono();
+      }
     }
 
     async atualizarMediaMensal():Promise<void>{
