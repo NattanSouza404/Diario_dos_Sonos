@@ -96,7 +96,7 @@ export default class ArmazenamentoLocal {
     async getUltimaMarcacao(): Promise<Date> {
         return this.getParsed<Date>(
             Chaves.ULTIMA_MARCACAO,
-            (raw) => new Date(JSON.parse(raw) as string),
+            (raw) => new Date(raw),
             new Date()
         );
     }
