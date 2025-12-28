@@ -90,11 +90,15 @@ export class SonoService implements ISonoService {
     }
 
     async toggleMarcacaoSono(): Promise<void> {
-      if (await this.getSonoIsAtivo()){
+      const novoSonoIsAtivo = ! (await this.getSonoIsAtivo());
+
+      if (novoSonoIsAtivo){
         await this.iniciarIntervaloSono();
       } else {
         await this.pararIntervaloSono();
       }
+
+      this.setSonoIsAtivo(novoSonoIsAtivo);
     }
 
     async atualizarMediaMensal():Promise<void>{
