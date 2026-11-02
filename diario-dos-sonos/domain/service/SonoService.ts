@@ -3,7 +3,6 @@ import MediaSono from "@/domain/models/MediaSono";
 import ArmazenamentoLocal from "../../storage/ArmazenamentoLocal";
 import { DeviceEventEmitter, EmitterSubscription } from "react-native";
 import { Calculadora } from "./Calculadora";
-import { validarSono } from "../validator/ValidadorSono";
 import { Formatador } from "@/utils/DataUtils";
 
 export interface ISonoService {
@@ -68,9 +67,9 @@ export class SonoService implements ISonoService {
             }
         });
 
-        validarSono(novoIntervalo);
-
-        intervalos.push(novoIntervalo);
+        intervalos.push(
+            new IntervaloSono(novoIntervalo.horaInicio, novoIntervalo.horaFim)
+        );
 
         this._armazenamento.setIntervalosSono(intervalos);
 
@@ -126,14 +125,16 @@ export class SonoService implements ISonoService {
             const dataI = Formatador(i.horaFim).data;
             
             if (dataI === dataIntervalo){
-                return intervaloSono;
+                return new IntervaloSono(intervaloSono.horaInicio, intervaloSono.horaFim);
             }
 
             return i;
         });
 
+        new IntervaloSono(intervaloSono.horaInicio, intervaloSono.horaFim);
+
         this._armazenamento.setIntervalosSono(novosIntervalos);
-        validarSono(intervaloSono);
+
         this.atualizarEstatisticas();
         this.emitirMudou();
     }
