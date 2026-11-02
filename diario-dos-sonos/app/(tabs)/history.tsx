@@ -26,8 +26,7 @@ export default function HistoryScreen() {
         />
       }
       height={0}
-      >
-
+    >
       <ThemedView style={[styles.container, styles.mainContainer]}>
 
         <AdicionarSonoButtton/>

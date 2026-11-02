@@ -4,20 +4,19 @@ import { ThemedView } from "../../../components/themed-view"
 import IntervaloSono from "@/domain/models/IntervaloSono";
 import { Pressable, StyleSheet } from "react-native";
 import { AlertUtils } from "@/utils/AlertUtils";
-import { SonoService } from "@/domain/service/SonoService";
 
 import { useState } from "react";
 
 import { useThemeColor } from "@/hooks/use-theme-color";
 import ModalEditarIntervaloSono from "./modal-editar-intervalo-sono";
 import { Ionicons } from "@expo/vector-icons";
+import { useIntervalosSono } from "@/hooks/use-intervalos-sono";
 
 type Props = {
     intervaloSono: IntervaloSono,
 }
 
 export const MarcacaoSono = ({intervaloSono }:Props) => {
-
     const vermelho = useThemeColor({}, 'vermelho');
 
     const [modalIsVisible, setModalIsVisible] = useState(false);
@@ -25,20 +24,20 @@ export const MarcacaoSono = ({intervaloSono }:Props) => {
     const horaInicio = intervaloSono.horaInicio;
     const horaFim = intervaloSono.horaFim;
 
-    const fmtInicio = Formatador(horaInicio);
-    const fmtFim = Formatador(horaFim);
-
     const diffInicioEFim = diferencaEntreDatas(horaInicio, horaFim);
+
+    const { deletarIntervaloSono } = useIntervalosSono();
 
     const deletarIntervalo = async (intervalo:IntervaloSono) => {
         AlertUtils.confirm(
             "Deseja realmente apagar esse intervalo de sono?",
 
-            async () => {
-                await SonoService.getInstance().deletarIntervaloSono(intervalo);
-            }
+            () => deletarIntervaloSono(intervalo)
         );
     }
+
+    const fmtInicio = Formatador(horaInicio);
+    const fmtFim = Formatador(horaFim);
 
     return (
         <ThemedView style={styles.marcacaoSono} backgroundIsSecondary={true} hasBorder={true}>

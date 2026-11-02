@@ -3,7 +3,6 @@ import { AlertUtils } from "@/utils/AlertUtils";
 import IntervaloSono from "@/domain/models/IntervaloSono";
 import { Pressable } from "react-native";
 
-import { SonoService } from "@/domain/service/SonoService";
 import { useEffect, useState } from "react";
 
 import { StyleSheet } from 'react-native';
@@ -14,6 +13,7 @@ import CustomModal from "@/components/custom-modal";
 import { ThemedView } from "@/components/themed-view";
 import { ThemedText } from "@/components/themed-text";
 import { SelecaoDateTime } from "@/components/selecao-date-time";
+import { useIntervalosSono } from "@/hooks/use-intervalos-sono";
 
 type Props = {
     isVisible: boolean,
@@ -32,20 +32,16 @@ export const ModalEditarIntervaloSono = ({intervaloSono, setIsVisible, isVisible
         }
       }, [isVisible]);
 
+    const {
+        editarIntervaloSono
+    } = useIntervalosSono();
+
     const confirmarEdicao = () => {
         AlertUtils.confirm("Confirma as alterações?", async () => {
             try {
-                const intervalo = new IntervaloSono(
-                    horaInicio, horaFim
+                await editarIntervaloSono(
+                    new IntervaloSono(horaInicio, horaFim)
                 );
-
-                intervalo.horaInicio.setDate(horaInicio.getDate());
-                intervalo.horaInicio.setMonth(horaInicio.getMonth());
-                intervalo.horaInicio.setFullYear(horaInicio.getFullYear());
-
-                const service = SonoService.getInstance();
-
-                await service.editarIntervaloSono(intervalo);
 
                 setIsVisible(false);
             } catch(error) {

@@ -9,21 +9,21 @@ export const useMarcacaoSono = () => {
   const [mediaMes, setMediaMes] = useState<any>({hora: 0, minuto: 0});
   const [mediaSemana, setMediaSemana] = useState<any>({hora: 0, minuto: 0});
 
-  const obterDados = async () => {
-    setSonoIsAtivo(
-      await service.getSonoIsAtivo()
-    );
-
-    setMediaMes(
-      await service.getMediaMensal()
-    );
-
-    setMediaSemana(
-      await service.getMediaSemanal()
-    );
-  };
-
   useEffect(() => {
+    const obterDados = async () => {
+        setSonoIsAtivo(
+            await service.getSonoIsAtivo()
+        );
+
+        setMediaMes(
+            await service.getMediaMensal()
+        );
+
+        setMediaSemana(
+            await service.getMediaSemanal()
+        );
+    };
+    
     obterDados();
 
     const subscription = service.onMudou(() => {

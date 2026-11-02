@@ -21,7 +21,26 @@ export const useIntervalosSono = () => {
         return () => subscription.remove();
     }, []);
 
+    const adicionarIntervaloSono = async (intervalo: IntervaloSono) => {
+        const service = SonoService.getInstance();
+
+        await service.adicionarIntervaloSono(intervalo);
+    }
+
+    const editarIntervaloSono = async (intervaloSono: IntervaloSono) => {
+        const service = SonoService.getInstance();
+
+        await service.editarIntervaloSono(intervaloSono);
+    }
+
+    const deletarIntervaloSono = async (intervalo: IntervaloSono) => {
+        await SonoService.getInstance().deletarIntervaloSono(intervalo);
+    }
+
     return {
-        intervalosPorMes
+        intervalosPorMes,
+        adicionarIntervaloSono,
+        editarIntervaloSono,
+        deletarIntervaloSono
     }
 }
