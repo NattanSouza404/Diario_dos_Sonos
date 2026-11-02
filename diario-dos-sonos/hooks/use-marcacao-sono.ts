@@ -1,5 +1,5 @@
 import { MarcacaoSono } from "@/domain/models/MarcacaoSono";
-import { SonoService } from "@/domain/service/SonoService";
+import { SonoService } from "@/services/SonoService";
 import { AlertUtils } from "@/utils/AlertUtils";
 import { useEffect, useState } from "react";
 
@@ -10,7 +10,7 @@ export const useMarcacaoSono = () => {
 
   useEffect(() => {
     const obterDados = async () => {
-      setMarcacaoSono(await service.getMarcacaoSono());
+      setMarcacaoSono(await service.consultarMarcacaoSono());
     };
 
     obterDados();

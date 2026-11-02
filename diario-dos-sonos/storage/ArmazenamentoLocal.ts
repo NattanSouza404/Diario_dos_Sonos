@@ -1,6 +1,9 @@
 import { Estatisticas } from "@/domain/models/Estatisticas";
 import IntervaloSono from "@/domain/models/IntervaloSono";
 import { MarcacaoSono } from "@/domain/models/MarcacaoSono";
+import { EstatisticasStorage } from "@/domain/storage/Estatisticas.storage";
+import { IntervaloSonoStorage } from "@/domain/storage/IntervaloSono.storage";
+import { MarcacaoSonoStorage } from "@/domain/storage/MarcacaoSono.storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Chaves = {
@@ -15,12 +18,68 @@ const ChavesEValoresPadrao = new Map<string, any>([
   [Chaves.ESTATISTICAS, new Estatisticas([])],
 ]);
 
-export default class ArmazenamentoLocal {
-
+export default class ArmazenamentoLocal implements
+    IntervaloSonoStorage, MarcacaoSonoStorage, EstatisticasStorage
+{
     ArmazenamentoLocal(){
         for (const [chave, valor] of ChavesEValoresPadrao) {
             this.inicializar(chave, valor);
         }
+    }
+
+    async consultarIntervalos(): Promise<IntervaloSono[]> {
+        return this.getParsed<IntervaloSono[]>(
+            Chaves.INTERVALOS_SONO,
+            (raw) => {
+                const parsed = JSON.parse(raw) as {
+                    horaInicio: string;
+                    horaFim: string 
+                }[];
+
+                return parsed.map(i =>
+                    new IntervaloSono(new Date(i.horaInicio), new Date(i.horaFim))
+                );
+            },
+            []
+        );
+    }
+
+    async consultarMarcacaoSono(): Promise<MarcacaoSono> {
+        return this.getParsed<MarcacaoSono>(
+            Chaves.MARCACAO_SONO,
+            (raw) => {
+                const parsed = JSON.parse(raw);
+                const isAtiva = Boolean(parsed?.isAtiva ?? parsed?.isAtivo);
+                const ultimaMarcacao = parsed?.ultimaMarcacao ? new Date(parsed.ultimaMarcacao) : null;
+
+                return new MarcacaoSono(isAtiva, ultimaMarcacao);
+            },
+            new MarcacaoSono(false, null)
+        );
+    }
+
+    async consultarEstatisticas(): Promise<Estatisticas> {
+        return this.getParsed<Estatisticas>(
+            Chaves.ESTATISTICAS,
+            (raw) => JSON.parse(raw) as Estatisticas,
+            new Estatisticas([])
+        );
+    }
+
+    async atualizarIntervalosSono(intervalos: IntervaloSono[]): Promise<void> {
+        const intervalosOrdenados = intervalos.sort(
+            (a, b) => b.horaFim.getTime() - a.horaFim.getTime()
+        );
+
+        AsyncStorage.setItem(Chaves.INTERVALOS_SONO, JSON.stringify(intervalosOrdenados));
+    }
+
+    async salvarMarcacaoSono(marcacao: MarcacaoSono): Promise<void> {
+        AsyncStorage.setItem(Chaves.MARCACAO_SONO, JSON.stringify(marcacao));
+    }
+
+    async salvarEstatisticas(estatisticas: Estatisticas): Promise<void> {
+        AsyncStorage.setItem(Chaves.ESTATISTICAS, JSON.stringify(estatisticas));
     }
 
     private async get(chave: string): Promise<string> {
@@ -59,61 +118,6 @@ export default class ArmazenamentoLocal {
         await this.set(chave, JSON.stringify(valorPadrao));
 
         return JSON.stringify(valorPadrao);
-    }
-
-    async getIntervalos(): Promise<IntervaloSono[]> {
-        return this.getParsed<IntervaloSono[]>(
-            Chaves.INTERVALOS_SONO,
-            (raw) => {
-                const parsed = JSON.parse(raw) as {
-                    horaInicio: string;
-                    horaFim: string 
-                }[];
-
-                return parsed.map(i =>
-                    new IntervaloSono(new Date(i.horaInicio), new Date(i.horaFim))
-                );
-            },
-            []
-        );
-    }
-
-    async getMarcacaoSono(): Promise<MarcacaoSono> {
-        return this.getParsed<MarcacaoSono>(
-            Chaves.MARCACAO_SONO,
-            (raw) => {
-                const parsed = JSON.parse(raw);
-                const isAtiva = Boolean(parsed?.isAtiva ?? parsed?.isAtivo);
-                const ultimaMarcacao = parsed?.ultimaMarcacao ? new Date(parsed.ultimaMarcacao) : null;
-
-                return new MarcacaoSono(isAtiva, ultimaMarcacao);
-            },
-            new MarcacaoSono(false, null)
-        );
-    }
-
-    async getEstatisticas(): Promise<Estatisticas> {
-        return this.getParsed<Estatisticas>(
-            Chaves.ESTATISTICAS,
-            (raw) => JSON.parse(raw) as Estatisticas,
-            new Estatisticas([])
-        );
-    }
-
-    async setIntervalosSono(intervalos: IntervaloSono[]): Promise<void> {
-        const intervalosOrdenados = intervalos.sort(
-            (a, b) => b.horaFim.getTime() - a.horaFim.getTime()
-        );
-
-        AsyncStorage.setItem(Chaves.INTERVALOS_SONO, JSON.stringify(intervalosOrdenados));
-    }
-
-    async setMarcacaoSono(marcacao: MarcacaoSono): Promise<void> {
-        AsyncStorage.setItem(Chaves.MARCACAO_SONO, JSON.stringify(marcacao));
-    }
-
-    async salvarEstatisticas(estatisticas: Estatisticas): Promise<void> {
-        AsyncStorage.setItem(Chaves.ESTATISTICAS, JSON.stringify(estatisticas));
     }
         
 }

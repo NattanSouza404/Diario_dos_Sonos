@@ -1,6 +1,6 @@
 import { Estatisticas } from "@/domain/models/Estatisticas";
 import IntervaloSono from "@/domain/models/IntervaloSono";
-import { SonoService } from "@/domain/service/SonoService";
+import { SonoService } from "@/services/SonoService";
 import { separarIntervalosPorMes } from "@/utils/IntervaloSonoUtils";
 import { useEffect, useState } from "react";
 
@@ -12,9 +12,9 @@ export const useIntervalosSono = () => {
 
     useEffect(() => {
         const obterDados = async () => {
-            const intervalosSono = await service.getIntervalos();
+            const intervalosSono = await service.consultarIntervalos();
             setIntervalosPorMes(separarIntervalosPorMes(intervalosSono));
-            setEstatisticas(await service.getEstatisticas());
+            setEstatisticas(await service.consultarEstatisticas());
         };
 
         obterDados();
