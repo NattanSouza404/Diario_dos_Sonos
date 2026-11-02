@@ -4,45 +4,15 @@ import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 
-import { useEffect, useState } from 'react';
-
-import IntervaloSono from '@/domain/models/IntervaloSono';
-
-import { SonoService } from '@/domain/service/SonoService';
-
 import AdicionarSonoButtton from '@/features/sono/components/adicionar-sono-button';
 
 import { SeparacaoMes } from '@/features/sono/components/separacao-mes';
-import { separarIntervalosPorMes } from '@/utils/IntervaloSonoUtils';
+import { useIntervalosSono } from '@/hooks/use-intervalos-sono';
 
 export default function HistoryScreen() {
-  const service = SonoService.getInstance();
-
-  const [intervalosSono, setIntervalosSono] = useState<IntervaloSono[]>([]);
-  const [intervalosPorMes, setIntervalosPorMes] = useState<Map<string, IntervaloSono[]>>(new Map());
-
-  const obterDados = async () => {
-    setIntervalosSono(
-      await service.getIntervalos()
-    );
-  };
-
-  useEffect(() => {
-    obterDados();
-
-    const subscription = service.onMudou(() => {
-      obterDados();
-    });
-
-    return () => subscription.remove();
-  }, []);
-
-  useEffect(() => {
-    setIntervalosPorMes(
-      separarIntervalosPorMes(intervalosSono)
-    );
-
-  }, [intervalosSono]);
+  const {
+    intervalosPorMes
+  } = useIntervalosSono();
 
   return (
     <ParallaxScrollView
