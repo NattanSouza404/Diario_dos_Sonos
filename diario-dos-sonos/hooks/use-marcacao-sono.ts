@@ -1,20 +1,18 @@
-import { Estatisticas } from "@/domain/models/Estatisticas";
-import { ISonoService, SonoService } from "@/domain/service/SonoService";
+import { MarcacaoSono } from "@/domain/models/MarcacaoSono";
+import { SonoService } from "@/domain/service/SonoService";
 import { AlertUtils } from "@/utils/AlertUtils";
 import { useEffect, useState } from "react";
 
 export const useMarcacaoSono = () => {
-  const service: ISonoService = SonoService.getInstance();
+  const service = SonoService.getInstance();
 
-  const [sonoIsAtivo, setSonoIsAtivo] = useState<boolean>(false);
-  const [estatisticas, setEstatisticas] = useState<Estatisticas>(new Estatisticas([]));
+  const [marcacaoSono, setMarcacaoSono] = useState<MarcacaoSono | null>(null);
 
   useEffect(() => {
     const obterDados = async () => {
-      setSonoIsAtivo(await service.getSonoIsAtivo());
-      setEstatisticas(await service.getEstatisticas());
+      setMarcacaoSono(await service.getMarcacaoSono());
     };
-    
+
     obterDados();
 
     const subscription = service.onMudou(() => {
@@ -24,32 +22,33 @@ export const useMarcacaoSono = () => {
     return () => subscription.remove();
   }, []);
 
-  const toggleIniciarSono = async () => {
-    const msg = sonoIsAtivo ? "Deseja parar de monitorar seu sono?" : "Deseja iniciar o monitoramento do seu sono?";
+  const toggleMarcacaoSono = async () => {
+    const msg = marcacaoSono?.isAtiva ? "Deseja parar de monitorar seu sono?" : "Deseja iniciar o monitoramento do seu sono?";
     
-    AlertUtils.confirm(msg, () => handleConfirmacao());
-  }
-
-  const handleConfirmacao = async () => {
-    try {
-      await service.toggleMarcacaoSono();
-      setSonoIsAtivo(await service.getSonoIsAtivo());
-    } catch (error) {
-      AlertUtils.alert((error as Error).message);
-    }
+    AlertUtils.confirm(
+      msg,
+      async () => { 
+        try {
+          setMarcacaoSono(await service.toggleMarcacaoSono());
+        } catch (error) {
+          AlertUtils.alert((error as Error).message);
+        }
+      }
+    );
   }
 
   const reiniciarMarcacao = async () => {
-    AlertUtils.confirm("Deseja reiniciar essa marcação?", () => {
-      setSonoIsAtivo(false);
-      service.setSonoIsAtivo(false);
-    });
+    AlertUtils.confirm(
+      "Deseja reiniciar essa marcação?",
+      async () => {
+        setMarcacaoSono(await service.reiniciarMarcacao());
+      }
+    );
   }
 
   return {
-    toggleIniciarSono,
-    reiniciarMarcacao,
-    sonoIsAtivo,
-    estatisticas
+    marcacaoSono,
+    toggleMarcacaoSono,
+    reiniciarMarcacao
   }
 }

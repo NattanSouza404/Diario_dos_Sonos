@@ -1,18 +1,17 @@
 import { Estatisticas } from "@/domain/models/Estatisticas";
 import IntervaloSono from "@/domain/models/IntervaloSono";
+import { MarcacaoSono } from "@/domain/models/MarcacaoSono";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Chaves = {
     INTERVALOS_SONO: "intervalosSono",
-    SONO_IS_ATIVO: "sonoIsAtivo",
-    ULTIMA_MARCACAO: "ultimaMarcacao",
     ESTATISTICAS: "estatisticas",
+    MARCACAO_SONO: "marcacaoSono",
 }
 
 const ChavesEValoresPadrao = new Map<string, any>([
   [Chaves.INTERVALOS_SONO, []],
-  [Chaves.SONO_IS_ATIVO, false],
-  [Chaves.ULTIMA_MARCACAO, new Date()],
+  [Chaves.MARCACAO_SONO, { isAtiva: false, ultimaMarcacao: null }],
   [Chaves.ESTATISTICAS, new Estatisticas([])],
 ]);
 
@@ -62,10 +61,6 @@ export default class ArmazenamentoLocal {
         return JSON.stringify(valorPadrao);
     }
 
-    /**
-     * Getters
-     */
-
     async getIntervalos(): Promise<IntervaloSono[]> {
         return this.getParsed<IntervaloSono[]>(
             Chaves.INTERVALOS_SONO,
@@ -83,19 +78,17 @@ export default class ArmazenamentoLocal {
         );
     }
 
-    async getSonoIsAtivo(): Promise<boolean> {
-        return this.getParsed<boolean>(
-            Chaves.SONO_IS_ATIVO,
-            (raw) => JSON.parse(raw) as boolean,
-            false
-        );
-    }
+    async getMarcacaoSono(): Promise<MarcacaoSono> {
+        return this.getParsed<MarcacaoSono>(
+            Chaves.MARCACAO_SONO,
+            (raw) => {
+                const parsed = JSON.parse(raw);
+                const isAtiva = Boolean(parsed?.isAtiva ?? parsed?.isAtivo);
+                const ultimaMarcacao = parsed?.ultimaMarcacao ? new Date(parsed.ultimaMarcacao) : null;
 
-    async getUltimaMarcacao(): Promise<Date> {
-        return this.getParsed<Date>(
-            Chaves.ULTIMA_MARCACAO,
-            (raw) => new Date(raw),
-            new Date()
+                return new MarcacaoSono(isAtiva, ultimaMarcacao);
+            },
+            new MarcacaoSono(false, null)
         );
     }
 
@@ -107,14 +100,6 @@ export default class ArmazenamentoLocal {
         );
     }
 
-    /**
-     * Setters
-     */
-
-    async setUltimaMarcacao(date: Date): Promise<void> {
-        AsyncStorage.setItem(Chaves.ULTIMA_MARCACAO, date.toISOString());
-    }
-
     async setIntervalosSono(intervalos: IntervaloSono[]): Promise<void> {
         const intervalosOrdenados = intervalos.sort(
             (a, b) => b.horaFim.getTime() - a.horaFim.getTime()
@@ -123,8 +108,8 @@ export default class ArmazenamentoLocal {
         AsyncStorage.setItem(Chaves.INTERVALOS_SONO, JSON.stringify(intervalosOrdenados));
     }
 
-    async setSonoIsAtivo(ativado: boolean): Promise<void> {
-        AsyncStorage.setItem(Chaves.SONO_IS_ATIVO, JSON.stringify(ativado));
+    async setMarcacaoSono(marcacao: MarcacaoSono): Promise<void> {
+        AsyncStorage.setItem(Chaves.MARCACAO_SONO, JSON.stringify(marcacao));
     }
 
     async salvarEstatisticas(estatisticas: Estatisticas): Promise<void> {

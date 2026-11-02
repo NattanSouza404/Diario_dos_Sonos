@@ -10,14 +10,18 @@ import { IconeTravesseiro } from '@/components/icons/IconeTravesseiro';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/theme';
 import { useMarcacaoSono } from '@/hooks/use-marcacao-sono';
+import { useIntervalosSono } from '@/hooks/use-intervalos-sono';
 
 export default function HomeScreen() {
   const {
-    estatisticas,
+    marcacaoSono,
     reiniciarMarcacao,
-    sonoIsAtivo,
-    toggleIniciarSono
+    toggleMarcacaoSono
   } = useMarcacaoSono();
+
+  const { 
+    estatisticas
+  } = useIntervalosSono();
 
   return (
     <ParallaxScrollView
@@ -47,9 +51,9 @@ export default function HomeScreen() {
 
           <ThemedView style={styles.container}>
             <MarcarSonoButton
-              sonoIsAtivo={sonoIsAtivo}
+              sonoIsAtivo={marcacaoSono?.isAtiva}
 
-              onPress={toggleIniciarSono}
+              onPress={toggleMarcacaoSono}
             />
 
             <Pressable style={styles.botaoReiniciar} onPress={reiniciarMarcacao}>

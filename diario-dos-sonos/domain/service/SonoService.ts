@@ -3,26 +3,14 @@ import ArmazenamentoLocal from "../../storage/ArmazenamentoLocal";
 import { DeviceEventEmitter, EmitterSubscription } from "react-native";
 import { Formatador } from "@/utils/DataUtils";
 import { Estatisticas } from "../models/Estatisticas";
+import { MarcacaoSono } from "../models/MarcacaoSono";
 
-export interface ISonoService {
-    getSonoIsAtivo(): Promise<boolean>;
-    setSonoIsAtivo(novoSonoIsAtivo: boolean): Promise<void>;
-    getIntervalos(): IntervaloSono[] | Promise<IntervaloSono[]>;
-    getEstatisticas(): Promise<Estatisticas>;
-
-    toggleMarcacaoSono(): Promise<void>;
-
-    editarIntervaloSono(intervaloSono: IntervaloSono): Promise<void>;
-
-    emitirMudou(): void;
-    onMudou(callback: () => void): EmitterSubscription;
-}
-
-export class SonoService implements ISonoService {
+export class SonoService {
 
     private _armazenamento = new ArmazenamentoLocal();
 
     private constructor(){}
+    
     private static instance : SonoService;
 
     static getInstance(): SonoService {
@@ -33,22 +21,22 @@ export class SonoService implements ISonoService {
         return this.instance;
     }
 
-    async getSonoIsAtivo(): Promise<boolean>{
-        return this._armazenamento.getSonoIsAtivo();
+    async getMarcacaoSono(): Promise<MarcacaoSono> {
+        return this._armazenamento.getMarcacaoSono();
     }
-
+    
     async getEstatisticas(): Promise<Estatisticas> {
         return this._armazenamento.getEstatisticas();
     }
 
-    async setSonoIsAtivo(novoSonoIsAtivo: boolean): Promise<void> {
-        await this._armazenamento.setSonoIsAtivo(novoSonoIsAtivo);
-        this.emitirMudou();
-    }
+    async reiniciarMarcacao(): Promise<MarcacaoSono> {
+        const marcacaoSono = await this._armazenamento.getMarcacaoSono();
+        marcacaoSono.reiniciar();
 
-    async iniciarIntervaloSono(): Promise<void> {
-        const date = new Date(Date.now());
-        await this._armazenamento.setUltimaMarcacao(date);
+        await this._armazenamento.setMarcacaoSono(marcacaoSono);
+        this.emitirMudou();
+
+        return marcacaoSono;
     }
 
     async adicionarIntervaloSono(novoIntervalo: IntervaloSono){
@@ -64,41 +52,31 @@ export class SonoService implements ISonoService {
             new IntervaloSono(novoIntervalo.horaInicio, novoIntervalo.horaFim)
         );
 
-        this._armazenamento.setIntervalosSono(intervalos);
+        await this._armazenamento.setIntervalosSono(intervalos);
 
-        this.atualizarEstatisticas();
+        await this.atualizarEstatisticas();
         this.emitirMudou();
     }
 
-    async pararIntervaloSono(): Promise<void> {
-        const date = new Date(Date.now()).toISOString();
+    async toggleMarcacaoSono(): Promise<MarcacaoSono> {
+      const marcacaoSono = await this._armazenamento.getMarcacaoSono();
 
+      if (!marcacaoSono.isAtiva) {
+        marcacaoSono.iniciar();
+      } else {
         const novoIntervalo = new IntervaloSono(
-            await this._armazenamento.getUltimaMarcacao(),
-            new Date(date)
+            marcacaoSono.ultimaMarcacao as Date,
+            new Date()
         );
 
         await this.adicionarIntervaloSono(novoIntervalo);
-    }
-
-    async toggleMarcacaoSono(): Promise<void> {
-      const novoSonoIsAtivo = ! (await this.getSonoIsAtivo());
-
-      if (novoSonoIsAtivo){
-        await this.iniciarIntervaloSono();
-      } else {
-        await this.pararIntervaloSono();
+        marcacaoSono.parar();
       }
 
-      this.setSonoIsAtivo(novoSonoIsAtivo);
-    }
+      await this._armazenamento.setMarcacaoSono(marcacaoSono);
+      this.emitirMudou();
 
-    private async atualizarEstatisticas(): Promise<void> {
-        const intervalos = await this.getIntervalos();
-
-        this._armazenamento.salvarEstatisticas(
-            new Estatisticas(intervalos)
-        );
+      return marcacaoSono;
     }
 
     async editarIntervaloSono(intervaloSono: IntervaloSono):Promise<void> {
@@ -139,6 +117,14 @@ export class SonoService implements ISonoService {
 
     async getIntervalos(): Promise<IntervaloSono[]> {
         return await this._armazenamento.getIntervalos();
+    }
+
+    private async atualizarEstatisticas(): Promise<void> {
+        const intervalos = await this.getIntervalos();
+
+        this._armazenamento.salvarEstatisticas(
+            new Estatisticas(intervalos)
+        );
     }
 
     emitirMudou():void{

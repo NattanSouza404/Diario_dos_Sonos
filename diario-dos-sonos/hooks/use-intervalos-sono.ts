@@ -1,3 +1,4 @@
+import { Estatisticas } from "@/domain/models/Estatisticas";
 import IntervaloSono from "@/domain/models/IntervaloSono";
 import { SonoService } from "@/domain/service/SonoService";
 import { separarIntervalosPorMes } from "@/utils/IntervaloSonoUtils";
@@ -7,11 +8,13 @@ export const useIntervalosSono = () => {
     const service = SonoService.getInstance();
 
     const [intervalosPorMes, setIntervalosPorMes] = useState<Map<string, IntervaloSono[]>>(new Map());
+    const [estatisticas, setEstatisticas] = useState<Estatisticas>(new Estatisticas([]));
 
     useEffect(() => {
         const obterDados = async () => {
             const intervalosSono = await service.getIntervalos();
             setIntervalosPorMes(separarIntervalosPorMes(intervalosSono));
+            setEstatisticas(await service.getEstatisticas());
         };
 
         obterDados();
@@ -39,6 +42,7 @@ export const useIntervalosSono = () => {
 
     return {
         intervalosPorMes,
+        estatisticas,
         adicionarIntervaloSono,
         editarIntervaloSono,
         deletarIntervaloSono
