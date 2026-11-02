@@ -1,4 +1,4 @@
-import IntervaloSono from "@/domain/models/IntervaloSono";
+import IntervaloSono from "@/src/features/sono/domain/models/IntervaloSono";
 
 describe("Validar sono", () => {
   it("deve lançar um erro se horaFim for menor ou igual a horaInicio", () => {

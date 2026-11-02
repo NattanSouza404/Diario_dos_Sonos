@@ -1,4 +1,4 @@
-import { primeiraLetraMaiuscula } from "@/utils/FormatadorUtils";
+import { primeiraLetraMaiuscula } from "@/src/shared/utils/FormatadorUtils";
 
 describe('FormatadorUtils', () => {
   test('deve capitalizar a primeira letra corretamente', () => {

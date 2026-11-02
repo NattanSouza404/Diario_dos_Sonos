@@ -1,5 +1,5 @@
-import IntervaloSono from "@/domain/models/IntervaloSono";
-import { separarIntervalosPorMes } from "@/utils/IntervaloSonoUtils";
+import IntervaloSono from "@/src/features/sono/domain/models/IntervaloSono";
+import { separarIntervalosPorMes } from "@/src/features/sono/utils/IntervaloSonoUtils";
 
 describe('Validar sono', () => {
   it('deve separar intervalos por mês corretamente', () => {

@@ -1,4 +1,4 @@
-import { avancarUmDia, diferencaEntreDatas, Formatador, retrocederUmDia } from "@/utils/DataUtils";
+import { avancarUmDia, diferencaEntreDatas, Formatador, retrocederUmDia } from "@/src/shared/utils/DataUtils";
 
 describe('DataUtils', () => {
   test('formata corretamente a data', () => {
