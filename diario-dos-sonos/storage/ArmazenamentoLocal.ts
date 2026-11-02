@@ -1,21 +1,19 @@
+import { Estatisticas } from "@/domain/models/Estatisticas";
 import IntervaloSono from "@/domain/models/IntervaloSono";
-import MediaSono  from "@/domain/models/MediaSono";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Chaves = {
     INTERVALOS_SONO: "intervalosSono",
     SONO_IS_ATIVO: "sonoIsAtivo",
     ULTIMA_MARCACAO: "ultimaMarcacao",
-    MEDIA_MES: "mediaMes",
-    MEDIA_SEMANA: "mediaSemana"
+    ESTATISTICAS: "estatisticas",
 }
 
 const ChavesEValoresPadrao = new Map<string, any>([
   [Chaves.INTERVALOS_SONO, []],
   [Chaves.SONO_IS_ATIVO, false],
   [Chaves.ULTIMA_MARCACAO, new Date()],
-  [Chaves.MEDIA_MES, { horas: 0, minutos: 0 }],
-  [Chaves.MEDIA_SEMANA, { horas: 0, minutos: 0 }],
+  [Chaves.ESTATISTICAS, new Estatisticas([])],
 ]);
 
 export default class ArmazenamentoLocal {
@@ -101,33 +99,17 @@ export default class ArmazenamentoLocal {
         );
     }
 
-    async getMediaMes(): Promise<MediaSono> {
-        return this.getParsed<MediaSono>(
-            Chaves.MEDIA_MES,
-            (raw) => JSON.parse(raw) as MediaSono,
-            { horas: 0, minutos: 0 }
-        );
-    }
-
-    async getMediaSemana(): Promise<MediaSono> {
-        return this.getParsed<MediaSono>(
-            Chaves.MEDIA_SEMANA,
-            (raw) => JSON.parse(raw) as MediaSono,
-            { horas: 0, minutos: 0 }
+    async getEstatisticas(): Promise<Estatisticas> {
+        return this.getParsed<Estatisticas>(
+            Chaves.ESTATISTICAS,
+            (raw) => JSON.parse(raw) as Estatisticas,
+            new Estatisticas([])
         );
     }
 
     /**
      * Setters
      */
-
-    async setMediasMes(media:MediaSono){
-        AsyncStorage.setItem(Chaves.MEDIA_MES, JSON.stringify(media));
-    }
-
-    async setMediasSemana(media:MediaSono){
-        AsyncStorage.setItem(Chaves.MEDIA_SEMANA, JSON.stringify(media));
-    }
 
     async setUltimaMarcacao(date: Date): Promise<void> {
         AsyncStorage.setItem(Chaves.ULTIMA_MARCACAO, date.toISOString());
@@ -143,6 +125,10 @@ export default class ArmazenamentoLocal {
 
     async setSonoIsAtivo(ativado: boolean): Promise<void> {
         AsyncStorage.setItem(Chaves.SONO_IS_ATIVO, JSON.stringify(ativado));
+    }
+
+    async salvarEstatisticas(estatisticas: Estatisticas): Promise<void> {
+        AsyncStorage.setItem(Chaves.ESTATISTICAS, JSON.stringify(estatisticas));
     }
         
 }

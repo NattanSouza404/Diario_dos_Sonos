@@ -1,3 +1,4 @@
+import { Estatisticas } from "@/domain/models/Estatisticas";
 import { ISonoService, SonoService } from "@/domain/service/SonoService";
 import { AlertUtils } from "@/utils/AlertUtils";
 import { useEffect, useState } from "react";
@@ -6,22 +7,12 @@ export const useMarcacaoSono = () => {
   const service: ISonoService = SonoService.getInstance();
 
   const [sonoIsAtivo, setSonoIsAtivo] = useState<boolean>(false);
-  const [mediaMes, setMediaMes] = useState<any>({hora: 0, minuto: 0});
-  const [mediaSemana, setMediaSemana] = useState<any>({hora: 0, minuto: 0});
+  const [estatisticas, setEstatisticas] = useState<Estatisticas>(new Estatisticas([]));
 
   useEffect(() => {
     const obterDados = async () => {
-        setSonoIsAtivo(
-            await service.getSonoIsAtivo()
-        );
-
-        setMediaMes(
-            await service.getMediaMensal()
-        );
-
-        setMediaSemana(
-            await service.getMediaSemanal()
-        );
+      setSonoIsAtivo(await service.getSonoIsAtivo());
+      setEstatisticas(await service.getEstatisticas());
     };
     
     obterDados();
@@ -59,7 +50,6 @@ export const useMarcacaoSono = () => {
     toggleIniciarSono,
     reiniciarMarcacao,
     sonoIsAtivo,
-    mediaMes,
-    mediaSemana
+    estatisticas
   }
 }

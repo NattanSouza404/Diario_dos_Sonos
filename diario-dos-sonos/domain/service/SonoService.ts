@@ -1,16 +1,14 @@
 import IntervaloSono from "@/domain/models/IntervaloSono";
-import MediaSono from "@/domain/models/MediaSono";
 import ArmazenamentoLocal from "../../storage/ArmazenamentoLocal";
 import { DeviceEventEmitter, EmitterSubscription } from "react-native";
-import { Calculadora } from "./Calculadora";
 import { Formatador } from "@/utils/DataUtils";
+import { Estatisticas } from "../models/Estatisticas";
 
 export interface ISonoService {
     getSonoIsAtivo(): Promise<boolean>;
-    getMediaMensal(): Promise<MediaSono>;
-    getMediaSemanal(): Promise<MediaSono>;
     setSonoIsAtivo(novoSonoIsAtivo: boolean): Promise<void>;
     getIntervalos(): IntervaloSono[] | Promise<IntervaloSono[]>;
+    getEstatisticas(): Promise<Estatisticas>;
 
     toggleMarcacaoSono(): Promise<void>;
 
@@ -23,7 +21,6 @@ export interface ISonoService {
 export class SonoService implements ISonoService {
 
     private _armazenamento = new ArmazenamentoLocal();
-    private _calculadora = new Calculadora();
 
     private constructor(){}
     private static instance : SonoService;
@@ -40,12 +37,8 @@ export class SonoService implements ISonoService {
         return this._armazenamento.getSonoIsAtivo();
     }
 
-    async getMediaMensal(): Promise<MediaSono> {
-        return await this._armazenamento.getMediaMes();
-    }
-
-    async getMediaSemanal(): Promise<MediaSono> {
-        return await this._armazenamento.getMediaSemana();
+    async getEstatisticas(): Promise<Estatisticas> {
+        return this._armazenamento.getEstatisticas();
     }
 
     async setSonoIsAtivo(novoSonoIsAtivo: boolean): Promise<void> {
@@ -100,19 +93,11 @@ export class SonoService implements ISonoService {
       this.setSonoIsAtivo(novoSonoIsAtivo);
     }
 
-    async atualizarMediaMensal():Promise<void>{
+    private async atualizarEstatisticas(): Promise<void> {
         const intervalos = await this.getIntervalos();
 
-        this._armazenamento.setMediasMes(
-            this._calculadora.calcularMediaMesAtual(intervalos)
-        );
-    }
-
-    async atualizarMediaSemanal():Promise<void>{
-        const intervalos = await this.getIntervalos();
-
-        this._armazenamento.setMediasSemana(
-            this._calculadora.calcularMediaSemanaAtual(intervalos)
+        this._armazenamento.salvarEstatisticas(
+            new Estatisticas(intervalos)
         );
     }
 
@@ -154,11 +139,6 @@ export class SonoService implements ISonoService {
 
     async getIntervalos(): Promise<IntervaloSono[]> {
         return await this._armazenamento.getIntervalos();
-    }
-
-    async atualizarEstatisticas(): Promise<void> {
-        this.atualizarMediaMensal();
-        this.atualizarMediaSemanal();
     }
 
     emitirMudou():void{

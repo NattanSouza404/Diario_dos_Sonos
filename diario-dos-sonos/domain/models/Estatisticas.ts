@@ -1,9 +1,20 @@
-import IntervaloSono from "@/domain/models/IntervaloSono";
-import MediaSono from "@/domain/models/MediaSono";
+import IntervaloSono from "./IntervaloSono";
 
-export class Calculadora {
+type MediaSono = {
+    horas: number,
+    minutos: number
+}
 
-    calcularMediaMesAtual(intervalos:IntervaloSono[]) : MediaSono {
+export class Estatisticas {
+    mediaMes: MediaSono;
+    mediaSemana: MediaSono;
+
+    constructor(intervalos: IntervaloSono[]){
+        this.mediaMes = this.calcularMediaMes(intervalos);
+        this.mediaSemana = this.calcularMediaSemana(intervalos);
+    }
+
+    private calcularMediaMes(intervalos: IntervaloSono[]) : MediaSono {
         const agora = new Date();
 
         const intervalosDoMes = intervalos.filter(i => 
@@ -15,7 +26,7 @@ export class Calculadora {
             return {
                 horas: 0,
                 minutos: 0
-            };
+            } as MediaSono;
         }
 
         let media = 0;
@@ -32,7 +43,7 @@ export class Calculadora {
         } as MediaSono;
     }
 
-    calcularMediaSemanaAtual(intervalos:IntervaloSono[]) : MediaSono {
+    private calcularMediaSemana(intervalos: IntervaloSono[]) : MediaSono {
         const agora = new Date();
         const primeiroDiaSemana = new Date(agora);
         primeiroDiaSemana.setDate(agora.getDate() - agora.getDay());
@@ -63,5 +74,4 @@ export class Calculadora {
             minutos: Math.floor(((media / intervalosDaSemana.length) % (1000 * 60 * 60)) / (1000 * 60))
         } as MediaSono;
     }
-    
 }

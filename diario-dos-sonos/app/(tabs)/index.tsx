@@ -13,8 +13,7 @@ import { useMarcacaoSono } from '@/hooks/use-marcacao-sono';
 
 export default function HomeScreen() {
   const {
-    mediaMes,
-    mediaSemana,
+    estatisticas,
     reiniciarMarcacao,
     sonoIsAtivo,
     toggleIniciarSono
@@ -62,14 +61,14 @@ export default function HomeScreen() {
           <ThemedView style={styles.container}>
             <ThemedText>Média da semana</ThemedText>
             <ThemedText type='subtitle'>
-              {mediaSemana.horas} horas e {mediaSemana.minutos} minutos
+              {estatisticas.mediaSemana.horas} horas e {estatisticas.mediaSemana.minutos} minutos
             </ThemedText>
           </ThemedView>
 
           <ThemedView style={styles.container}>
             <ThemedText>Média do mês</ThemedText>
             <ThemedText type='subtitle'>
-              {mediaMes.horas} horas e {mediaMes.minutos} minutos
+              {estatisticas.mediaMes.horas} horas e {estatisticas.mediaMes.minutos} minutos
             </ThemedText>
           </ThemedView>
         </ThemedView>
