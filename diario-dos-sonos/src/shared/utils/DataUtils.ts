@@ -1,7 +1,7 @@
 import { primeiraLetraMaiuscula } from "@/src/shared/utils/FormatadorUtils";
 
-const LOCAL = "pt-BR";
-const OPCOES = { timeZone: 'America/Sao_Paulo', hour12: false };
+export const LOCAL = "pt-BR";
+export const OPCOES: Intl.DateTimeFormatOptions = { timeZone: 'America/Sao_Paulo', hour12: false };
 
 export const Formatador = (data: Date) => {
     return {
@@ -10,13 +10,13 @@ export const Formatador = (data: Date) => {
         ano:        data.toLocaleString(LOCAL, { ...OPCOES, year: 'numeric' }),
         diaSemana:  primeiraLetraMaiuscula(data.toLocaleString(LOCAL, { ...OPCOES, weekday: 'long' })),
 
-        data:       data.toLocaleString(LOCAL).slice(0, 10),
+        data:       data.toLocaleDateString(LOCAL, OPCOES),
 
         hora:       data.toLocaleString(LOCAL, { ...OPCOES, hour: '2-digit' }),
         minuto:     data.toLocaleString(LOCAL, { ...OPCOES, minute: '2-digit' }),
         segundo:    data.toLocaleString(LOCAL, { ...OPCOES, second: '2-digit' }),
 
-        horario:    data.toLocaleString(LOCAL).slice(12, 20)
+        horario:    data.toLocaleTimeString(LOCAL, OPCOES)
     }
 }
 

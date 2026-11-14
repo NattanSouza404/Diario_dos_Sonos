@@ -1,8 +1,8 @@
-import { avancarUmDia, diferencaEntreDatas, Formatador, retrocederUmDia } from "@/src/shared/utils/DataUtils";
+import { avancarUmDia, diferencaEntreDatas, Formatador, LOCAL, OPCOES, retrocederUmDia } from "@/src/shared/utils/DataUtils";
 
 describe('DataUtils', () => {
   test('formata corretamente a data', () => {
-    const data = new Date('2024-06-15T14:30:45');
+    const data = new Date('2024-06-15T14:30:45-03:00');
     const formatacao = Formatador(data); 
 
     expect(formatacao).toEqual(
@@ -12,7 +12,7 @@ describe('DataUtils', () => {
         ano: "2024",
         diaSemana: "Sábado",
 
-        data: "15/06/2024",
+        data: data.toLocaleDateString(LOCAL, OPCOES),
 
         hora: "14",
         minuto: "30",    
